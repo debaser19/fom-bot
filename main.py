@@ -17,16 +17,51 @@ def get_fom_sheet():
     return gc.open_by_url(config.FOM_SHEET)
 
 
+class Player:
+    def __init__(self, challonge_name, bnet_tag, discord_tag, race):
+        self.challonge_name = challonge_name
+        self.bnet_tag = bnet_tag
+        self.discord_tag = discord_tag
+        self.race = race
+
+
+def get_players_list():
+    sheet = get_fom_sheet()
+    ws = sheet.worksheet("player api")
+    records = ws.get_all_records()
+
+    players = []
+    
+    for record in records:
+        players.append(
+            Player(
+                record.get('challonge name'),
+                record.get('battlenet tag'),
+                record.get('discord name'),
+                record.get('race')
+            )
+        )
+    
+    return players
+
+
+@bot.command(name='players')
+async def players(ctx:commands.Context):
+    players = get_players_list()
+    for player in players:
+        print(player)
+
+
 @bot.command(name='s2')
 async def s2(ctx: commands.Context, username=None):
-    worksheet = get_fom_sheet().get_worksheet(2)
+    worksheet = get_fom_sheet().get_worksheet("player api")
     if username:
-        if username.lower() in worksheet.get_all_records()
-        for user in worksheet.get_all_records():
-            if username.lower() in user['Player'].lower():
-                print(f'found {user["Player"]}')
-            else:
-                print(f'Username not found - {user["Player"]}')
+        if username.lower() in worksheet.get_all_records():
+            for user in worksheet.get_all_records():
+                if username.lower() in user['Player'].lower():
+                    print(f'found {user["Player"]}')
+                else:
+                    print(f'Username not found - {user["Player"]}')
     else:
         print('Dumping stats list')
         df = pd.DataFrame(data=worksheet.get_all_values())
