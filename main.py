@@ -12,7 +12,7 @@ def get_fom_sheet():
 
 
 class Player:
-    def __init__(self, name, race, wins, losses, win_pct, seasons, s1_champ, s2_champ, s1_mp, s2_mp, total_mp, rank):
+    def __init__(self, name, race, wins, losses, win_pct, seasons, s1_champ, s2_champ, s1_mp, s2_mp, total_mp, rank, bnet_name, w3c_tag, discord_name):
         self.name = name
         self.race = race
         self.wins = wins
@@ -25,6 +25,9 @@ class Player:
         self.s2_mp = s2_mp
         self.total_mp = total_mp
         self.rank = rank
+        self.bnet_name = bnet_name
+        self.w3c_tag = w3c_tag
+        self.discord_name = discord_name
 
 
 def get_players_list():
@@ -48,7 +51,10 @@ def get_players_list():
                 record.get('s1 MP'),
                 record.get('s2 MP'),
                 record.get('MP'),
-                record.get('Rank')
+                record.get('Rank'),
+                record.get('BNet Name'),
+                record.get('W3C Tag'),
+                record.get('Discord Name')
             )
         )
     
@@ -59,9 +65,12 @@ def get_players_list():
 async def stats(ctx:commands.Context, user):
     players = get_players_list()
     for player in players:
-        if user.lower() == player.name.lower():
+        player_tags = [player.name.lower(), player.bnet_name.lower(), player.w3c_tag.lower, player.discord_name.lower()]
+        if user.lower() in player_tags:
             content_string = f"""
             **Player Name**: {player.name}
+            **W3C Tag**: {player.w3c_tag}
+            **Discord Tag**: {player.discord_name}
             **Rank**: {player.rank}
             **Race**: {player.race}
             **Wins**: {player.wins}
@@ -73,7 +82,7 @@ async def stats(ctx:commands.Context, user):
             **Total Manner Points**: {player.total_mp}
             """
             embed = discord.Embed(
-                title=f"{player.name} Stats",
+                title=f"{user} Stats",
                 colour=0x0C2C55,
                 description=content_string
             )
