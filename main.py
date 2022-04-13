@@ -67,20 +67,7 @@ async def stats(ctx:commands.Context, user):
     for player in players:
         player_tags = [player.name.lower(), player.bnet_name.lower(), player.w3c_tag.lower, player.discord_name.lower()]
         if user.lower() in player_tags:
-            content_string = f"""
-            **Name**: {player.name}
-            **W3C**: {player.w3c_tag}
-            **Discord**: {player.discord_name}
-            **Rank**: {player.rank}
-            **Race**: {player.race}
-            **Wins**: {player.wins}
-            **Losses**: {player.losses}
-            **Win%**: {player.win_pct}
-            **Seasons Played**: {player.seasons}
-            **S1 MP**: {player.s1_mp}
-            **S2 MP**: {player.s2_mp}
-            **Total MP**: {player.total_mp}
-            """
+            content_string = f'**Name**: {player.name}\n**W3C**: {player.w3c_tag}\n**Discord**: {player.discord_name}\n**Rank**: {player.rank}\n**Race**: {player.race}\n**Wins**: {player.wins}\n**Losses**: {player.losses}\n**Win%**: {player.win_pct}\n**Seasons Played**: {player.seasons}\n**S1 MP**: {player.s1_mp}\n**S2 MP**: {player.s2_mp}\n**Total MP**: {player.total_mp}'
             embed = discord.Embed(
                 title=f"{user} Stats",
                 colour=0x0C2C55,
