@@ -1,2 +1,3 @@
 discord
 gspread
+table2ascii

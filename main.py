@@ -1,6 +1,7 @@
 from discord.ext import commands
 import discord
 import gspread
+from table2ascii import table2ascii as t2a, PresetStyle
 
 import string_commands
 import config
@@ -97,19 +98,31 @@ async def mannerpoints(ctx:commands.Context):
 
 @bot.command(name="leaderboard")
 async def leaderboard(ctx:commands.Context, limit=15):
+    if limit > 50:
+        await ctx.reply("Leaderboard limited to 50 due to discord character limit")
+        limit = 50
+    elif limit < 1:
+        await ctx.reply("Leaderboard limit must be greater than or equal to 1")
+        limit = 1
+
     players = get_players_list()
     players.sort(key=lambda x: int(x.rank))
-    top_n = players[0:limit - 1]
-    content = ""
+    top_n = players[0:limit]
+    leaderboard_list = []
     for player in top_n:
-        if "__" in player.name:
-            player.name = player.name.replace("_", "")
-        content += f"{player.rank})\t{player.total_mp} MP\t{player.name}\n"
+        leaderboard_list.append([player.rank, player.name, player.race, player.total_mp])
+    
+    content = t2a(
+        header=["Rank", "Name", "Race", "Total MP"],
+        body=leaderboard_list,
+        style=PresetStyle.thin_compact,
+        first_col_heading=True
+    )
     
     embed = discord.Embed(
         title=f"FoML Leaderboard - Top {limit}",
         colour=0x0C2C55,
-        description=f"```{content}```"
+        description=f"```\n{content}\n```"
     )
     fom_logo = 'https://s3.amazonaws.com/challonge_app/organizations/images/000/143/459/large/discord_icon.png'
     embed.set_author(name='Fountain of Manner', icon_url=fom_logo)
