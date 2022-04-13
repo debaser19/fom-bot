@@ -88,6 +88,10 @@ async def stats(ctx:commands.Context, user):
 
             await ctx.reply(embed=embed, file=champ_logo)
 
+        else:
+            await ctx.reply(f"Could not find username: {user}")
+            break
+
 
 @bot.command(name='mannerpoints', aliases=['mp'])
 async def mannerpoints(ctx:commands.Context):
