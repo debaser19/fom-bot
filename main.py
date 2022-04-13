@@ -68,18 +68,18 @@ async def stats(ctx:commands.Context, user):
         player_tags = [player.name.lower(), player.bnet_name.lower(), player.w3c_tag.lower, player.discord_name.lower()]
         if user.lower() in player_tags:
             content_string = f"""
-            **Player Name**: {player.name}
-            **W3C Tag**: {player.w3c_tag}
-            **Discord Tag**: {player.discord_name}
+            **Name**: {player.name}
+            **W3C**: {player.w3c_tag}
+            **Discord**: {player.discord_name}
             **Rank**: {player.rank}
             **Race**: {player.race}
             **Wins**: {player.wins}
             **Losses**: {player.losses}
-            **Win Pct**: {player.win_pct}
+            **Win%**: {player.win_pct}
             **Seasons Played**: {player.seasons}
-            **Season 1 Manner Points**: {player.s1_mp}
-            **Season 2 Manner Points**: {player.s2_mp}
-            **Total Manner Points**: {player.total_mp}
+            **S1 MP**: {player.s1_mp}
+            **S2 MP**: {player.s2_mp}
+            **Total MP**: {player.total_mp}
             """
             embed = discord.Embed(
                 title=f"{user} Stats",
@@ -89,13 +89,16 @@ async def stats(ctx:commands.Context, user):
 
             fom_logo = 'https://s3.amazonaws.com/challonge_app/organizations/images/000/143/459/large/discord_icon.png'
             embed.set_author(name='Fountain of Manner', icon_url=fom_logo)
+            champ_logo = None
 
             if player.s1_champ == 'YES':
-                embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/963256852613832734/963258532847845476/trophy_1.png')
+                champ_logo = discord.File('./images/fom_s1_champ.png', filename='fom_s1_champ.png')
+                embed.set_thumbnail(url='attachment://fom_s1_champ.png')
             if player.s2_champ == 'YES':
-                embed.set_thumbnail(url='https://i.imgur.com/txh9BQm.png')
+                champ_logo = discord.File('./images/fom_s2_champ.png', filename='fom_s2_champ.png')
+                embed.set_thumbnail(url='attachment://fom_s2_champ.png')
 
-            await ctx.reply(embed=embed)
+            await ctx.reply(embed=embed, file=champ_logo)
 
 
 @bot.event
