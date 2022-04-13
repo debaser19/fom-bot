@@ -2,6 +2,7 @@ from discord.ext import commands
 import discord
 import gspread
 
+import string_commands
 import config
 
 bot = commands.Bot(command_prefix="!")
@@ -86,6 +87,12 @@ async def stats(ctx:commands.Context, user):
                 embed.set_thumbnail(url='attachment://fom_s2_champ.png')
 
             await ctx.reply(embed=embed, file=champ_logo)
+
+
+@bot.command(name='mannerpoints', aliases=['mp'])
+async def mannerpoints(ctx:commands.Context):
+    content = string_commands.mannerpoints
+    await ctx.reply(content)
 
 
 @bot.event
