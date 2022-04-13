@@ -95,6 +95,28 @@ async def mannerpoints(ctx:commands.Context):
     await ctx.reply(content)
 
 
+@bot.command(name="leaderboard")
+async def leaderboard(ctx:commands.Context, limit=15):
+    players = get_players_list()
+    players.sort(key=lambda x: int(x.rank))
+    top_n = players[0:limit - 1]
+    content = ""
+    for player in top_n:
+        if "__" in player.name:
+            player.name = player.name.replace("_", "")
+        content += f"{player.rank})\t{player.total_mp} MP\t{player.name}\n"
+    
+    embed = discord.Embed(
+        title=f"FoML Leaderboard - Top {limit}",
+        colour=0x0C2C55,
+        description=f"```{content}```"
+    )
+    fom_logo = 'https://s3.amazonaws.com/challonge_app/organizations/images/000/143/459/large/discord_icon.png'
+    embed.set_author(name='Fountain of Manner', icon_url=fom_logo)
+
+    await ctx.reply(embed=embed)
+
+
 @bot.event
 async def on_ready():
     print(f'We have logged in as {bot.user}')
