@@ -95,12 +95,12 @@ async def mannerpoints(ctx:commands.Context):
     await ctx.reply(string_commands.mannerpoints)
 
 
-@bot.commands(name='foml')
+@bot.command(name='foml')
 async def foml(ctx:commands.Context):
     await ctx.reply(string_commands.foml)
 
 
-@bot.commands(name='veto')
+@bot.command(name='veto')
 async def veto(ctx:commands.Context):
     await ctx.reply(string_commands.veto)
 
