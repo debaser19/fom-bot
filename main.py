@@ -92,8 +92,17 @@ async def stats(ctx:commands.Context, user):
 
 @bot.command(name='mannerpoints', aliases=['mp'])
 async def mannerpoints(ctx:commands.Context):
-    content = string_commands.mannerpoints
-    await ctx.reply(content)
+    await ctx.reply(string_commands.mannerpoints)
+
+
+@bot.commands(name='foml')
+async def foml(ctx:commands.Context):
+    await ctx.reply(string_commands.foml)
+
+
+@bot.commands(name='veto')
+async def veto(ctx:commands.Context):
+    await ctx.reply(string_commands.veto)
 
 
 @bot.command(name="leaderboard")
