@@ -105,6 +105,11 @@ async def veto(ctx:commands.Context):
     await ctx.reply(string_commands.veto)
 
 
+@bot.command(name='launcher')
+async def launcher(ctx:commands.Context):
+    await ctx.reply(string_commands.launcher)
+
+
 @bot.command(name="leaderboard")
 async def leaderboard(ctx:commands.Context, limit=15):
     if limit > 50:
