@@ -2,9 +2,11 @@ from discord.ext import commands
 import discord
 import gspread
 from table2ascii import table2ascii as t2a, PresetStyle
+import challonge
 
 import string_commands
 import config
+import challonge_commands
 
 bot = commands.Bot(command_prefix="!")
 
@@ -142,6 +144,39 @@ async def leaderboard(ctx:commands.Context, limit=15):
     embed.set_author(name='Fountain of Manner', icon_url=fom_logo)
 
     await ctx.reply(embed=embed)
+
+
+@bot.command(name="listmatches")
+async def listmatches(ctx:commands.Context, group, round, second_round=None):
+    challonge.set_credentials("debaser19", config.CHALLONGE_KEY)
+    tournament = challonge.tournaments.show(config.FOML_S3_ID)
+
+    matches = challonge_commands.fetch_matches(tournament)
+    match_list = []
+    for match in matches:
+        if match.group.lower() == group.lower() and int(match.round) == int(round):
+            match_list.append(match)
+    
+    reply_string = ""
+    for match in match_list:
+        reply_string += f"[Round {match.round}] [Group {match.group}] - @{match.p1_discord} [{match.p1_race}] VS @{match.p2_discord} [{match.p2_race}]"
+        if match.state == 'complete':
+            reply_string += f" [{match.state.upper()}: {match.score}]"
+        reply_string += "\n"
+
+    if second_round:
+        reply_string += f"\n\n **GROUP {match.group} - ROUND {second_round}**"
+        for match in matches:
+            if match.group.lower() == group.lower() and int(match.round) == int(second_round):
+                match_list.append(match)
+        
+        for match in match_list:
+            reply_string += f"[Round {match.round}] [Group {match.group}] - @{match.p1_discord} [{match.p1_race}] VS @{match.p2_discord} [{match.p2_race}]"
+            if match.state == 'complete':
+                reply_string += f" [{match.state.upper()}: {match.score}]"
+            reply_string += "\n"
+
+    await ctx.reply(f"**GROUP {match.group.upper()} - ROUND {round}**\n{reply_string}\n\n@here")
 
 
 @bot.event
