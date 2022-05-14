@@ -19,7 +19,7 @@ def get_fom_sheet():
 
 
 class Player:
-    def __init__(self, name, race, wins, losses, win_pct, seasons, s1_champ, s2_champ, s1_mp, s2_mp, total_mp, rank, bnet_name, w3c_tag, discord_name):
+    def __init__(self, name, race, wins, losses, win_pct, seasons, s1_champ, s2_champ, s3_champ, s1_mp, s2_mp, s3_mp, total_mp, rank, bnet_name, w3c_tag, discord_name):
         self.name = name
         self.race = race
         self.wins = wins
@@ -28,8 +28,10 @@ class Player:
         self.seasons = seasons
         self.s1_champ = s1_champ
         self.s2_champ = s2_champ
+        self.s3_champ = s3_champ
         self.s1_mp = s1_mp
         self.s2_mp = s2_mp
+        self.s3_mp = s3_mp
         self.total_mp = total_mp
         self.rank = rank
         self.bnet_name = bnet_name
@@ -55,8 +57,10 @@ def get_players_list():
                 record.get('Seasons'),
                 record.get('S1 CHAMP'),
                 record.get('S2 CHAMP'),
+                record.get('S3 CHAMP'),
                 record.get('s1 MP'),
                 record.get('s2 MP'),
+                record.get('s3 MP'),
                 record.get('MP'),
                 record.get('Rank'),
                 record.get('BNet Name'),
@@ -74,7 +78,7 @@ async def stats(ctx:commands.Context, user):
     for player in players:
         player_tags = [player.name.lower(), player.bnet_name.lower(), player.w3c_tag.lower, player.discord_name.lower()]
         if user.lower() in player_tags:
-            content_string = f'**Name**: {player.name}\n**W3C**: {player.w3c_tag}\n**Discord**: {player.discord_name}\n**Rank**: {player.rank}\n**Race**: {player.race}\n**Wins**: {player.wins}\n**Losses**: {player.losses}\n**Win%**: {player.win_pct}\n**Seasons Played**: {player.seasons}\n**S1 MP**: {player.s1_mp}\n**S2 MP**: {player.s2_mp}\n**Total MP**: {player.total_mp}'
+            content_string = f'**Name**: {player.name}\n**W3C**: {player.w3c_tag}\n**Discord**: {player.discord_name}\n**Rank**: {player.rank}\n**Race**: {player.race}\n**Wins**: {player.wins}\n**Losses**: {player.losses}\n**Win%**: {player.win_pct}\n**Seasons Played**: {player.seasons}\n**S1 MP**: {player.s1_mp}\n**S2 MP**: {player.s2_mp}\n**S3 MP**: {player.s3_mp}\n**Total MP**: {player.total_mp}'
             embed = discord.Embed(
                 title=f"{user} Stats",
                 colour=0x0C2C55,
@@ -89,6 +93,9 @@ async def stats(ctx:commands.Context, user):
                 champ_logo = discord.File('./images/fom_s1_champ.png', filename='fom_s1_champ.png')
                 embed.set_thumbnail(url='attachment://fom_s1_champ.png')
             if player.s2_champ == 'YES':
+                champ_logo = discord.File('./images/fom_s2_champ.png', filename='fom_s2_champ.png')
+                embed.set_thumbnail(url='attachment://fom_s2_champ.png')
+            if player.s3_champ == 'YES':
                 champ_logo = discord.File('./images/fom_s2_champ.png', filename='fom_s2_champ.png')
                 embed.set_thumbnail(url='attachment://fom_s2_champ.png')
 
