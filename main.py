@@ -150,6 +150,7 @@ async def leaderboard(ctx:commands.Context, limit=15):
 
 
 @bot.command(name="listmatches")
+@commands.has_role('FoM League Admin')
 async def listmatches(ctx:commands.Context, group, round, second_round=None):
     challonge.set_credentials("debaser19", config.CHALLONGE_KEY)
     tournament = challonge.tournaments.show(config.FOML_S3_ID)
