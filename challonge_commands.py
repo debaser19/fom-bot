@@ -24,11 +24,13 @@ class Match:
         self.p1_id = p1_id
         self.p1_name = p1_name
         self.p1_discord = p1_discord
+        self.p1_discord_id = None
         self.p1_region = p1_region
         self.p1_race = p1_race
         self.p2_id = p2_id
         self.p2_name = p2_name
         self.p2_discord = p2_discord
+        self.p2_discord_id = None
         self.p2_region = p2_region
         self.p2_race = p2_race
         self.state = state

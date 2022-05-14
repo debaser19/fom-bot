@@ -8,7 +8,10 @@ import string_commands
 import config
 import challonge_commands
 
-bot = commands.Bot(command_prefix="!")
+intents = discord.Intents.default()
+intents.members = True
+
+bot = commands.Bot(command_prefix="!", intents=intents)
 
 def get_fom_sheet():
     gc = gspread.service_account(filename=config.SERVICE_ACCOUNT_FILE)
@@ -152,6 +155,7 @@ async def listmatches(ctx:commands.Context, group, round, second_round=None):
     tournament = challonge.tournaments.show(config.FOML_S3_ID)
 
     matches = challonge_commands.fetch_matches(tournament)
+    member_list = get_members(guild)
     match_list = []
     for match in matches:
         if match.group.lower() == group.lower() and int(match.round) == int(round):
@@ -159,7 +163,12 @@ async def listmatches(ctx:commands.Context, group, round, second_round=None):
     
     reply_string = ""
     for match in match_list:
-        reply_string += f"[Round {match.round}] [Group {match.group}] - @{match.p1_discord} [{match.p1_race}] VS @{match.p2_discord} [{match.p2_race}]"
+        for member in member_list:
+            if str(member["member_name"]).lower() == str(match.p1_discord).lower():
+                match.p1_discord_id = member["member_id"]
+            elif str(member["member_name"]).lower() == str(match.p2_discord).lower():
+                match.p2_discord_id = member["member_id"]
+        reply_string += f"[Round {match.round}] [Group {match.group}] - <@!{match.p1_discord_id}> [{match.p1_race}] VS <@!{match.p2_discord_id}> [{match.p2_race}]"
         if match.state == 'complete':
             reply_string += f" [{match.state.upper()}: {match.score}]"
         reply_string += "\n"
@@ -172,17 +181,54 @@ async def listmatches(ctx:commands.Context, group, round, second_round=None):
                 match_list.append(match)
         
         for match in match_list:
-            reply_string += f"[Round {match.round}] [Group {match.group}] - @{match.p1_discord} [{match.p1_race}] VS @{match.p2_discord} [{match.p2_race}]"
+            for member in member_list:
+                if str(member["member_name"]).lower() == str(match.p1_discord).lower():
+                    match.p1_discord_id = member["member_id"]
+                elif str(member["member_name"]).lower() == str(match.p2_discord).lower():
+                    match.p2_discord_id = member["member_id"]
+            reply_string += f"[Round {match.round}] [Group {match.group}] - <@!{match.p1_discord_id}> [{match.p1_race}] VS <@!{match.p2_discord_id}> [{match.p2_race}]"
             if match.state == 'complete':
                 reply_string += f" [{match.state.upper()}: {match.score}]"
             reply_string += "\n"
 
-    await ctx.reply(f"**GROUP {match.group.upper()} - ROUND {round}**\n{reply_string}\n\n@here")
+    await ctx.reply(f"**GROUP {match.group.upper()} - ROUND {round}**\n{reply_string}")
+
+
+# @bot.command(name="getmembers")
+# async def getmembers(ctx:commands.Context):
+#     member_list = get_members(guild)
+#     for member in member_list:
+#         print(member["member_id"], member["member_name"])
+#         await ctx.send(f"tagging <@!{member['member_id']}>")
+
+
+def get_members(guild):
+    member_list = []
+    for member in guild.members:
+        member_list.append({"member_name": member, "member_id": member.id})
+    
+    return member_list
+
+
+def get_member_id(username):
+    member_list = get_members(guild)
+    for member in member_list:
+        if username.lower() == member["mamber_name"].lower():
+            return member["member_id"]
+
+
+@bot.command(pass_context = True)
+async def getserverid(ctx):
+   serverId = ctx.message.guild.id
+   await ctx.send(serverId)
 
 
 @bot.event
 async def on_ready():
+    global guild
+    guild = bot.get_guild(config.FOM_GUILD_ID)
     print(f'We have logged in as {bot.user}')
+
 
 DISCORD_TOKEN = config.DISCORD_TOKEN
 bot.run(DISCORD_TOKEN)
