@@ -1,4 +1,4 @@
 discord
 gspread
 table2ascii
-challonge
+pychallonge
