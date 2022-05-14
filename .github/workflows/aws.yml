@@ -74,7 +74,7 @@ jobs:
           sudo echo "SERVICE_ACCOUNT_FILE='${{ secrets.SERVICE_ACCOUNT_FILE }}'" >> config.py
           sudo echo "CHALLONGE_KEY='${{ secrets.CHALLONGE_KEY }}'" >> config.py
           sudo echo "FOML_S3_ID='${{ secrets.FOML_S3_ID }}'" >> config.py
-          sudo echo "FOM_GUILD_ID='{{ secrets.FOM_GUILD_ID }}" >> config.py
+          sudo echo "FOM_GUILD_ID='${{ secrets.FOM_GUILD_ID }}" >> config.py
           sudo echo '${{ secrets.SHEETS_KEY }}' > ${{ secrets.SERVICE_ACCOUNT_FILE }}
           sudo docker cp config.py ${{ env.CONTAINER_NAME }}:/data
           sudo docker cp ${{ secrets.SERVICE_ACCOUNT_FILE }} ${{ env.CONTAINER_NAME }}:/data
