@@ -165,7 +165,8 @@ async def listmatches(ctx:commands.Context, group, round, second_round=None):
         reply_string += "\n"
 
     if second_round:
-        reply_string += f"\n\n **GROUP {match.group} - ROUND {second_round}**"
+        match_list = []
+        reply_string += f"\n\n **GROUP {match.group} - ROUND {second_round}**\n"
         for match in matches:
             if match.group.lower() == group.lower() and int(match.round) == int(second_round):
                 match_list.append(match)
