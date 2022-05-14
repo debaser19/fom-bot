@@ -226,7 +226,7 @@ async def getserverid(ctx):
 @bot.event
 async def on_ready():
     global guild
-    guild = bot.get_guild(config.FOM_GUILD_ID)
+    guild = bot.get_guild(int(config.FOM_GUILD_ID))
     print(f'We have logged in as {bot.user}')
 
 
