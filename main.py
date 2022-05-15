@@ -168,7 +168,10 @@ async def listmatches(ctx:commands.Context, group, round, second_round=None):
     for match in matches:
         if match.group.lower() == group.lower() and int(match.round) == int(round):
             match_list.append(match)
-    
+
+    channel_links_and_info = 879207158477127702
+    channel_rules_and_faq = 879208033417330709
+    info_string = f"**MATCHUPS FOR THIS WEEK** (Round {round} {'+ ' + second_round if second_round else ''} in Challonge)\n\nPlease complete these games (BO3) by the end of Sunday. Check <#{channel_rules_and_faq}> and <#{channel_links_and_info}> for more information on the veto process (or type `!veto` in this server for veto rules), map pool, and more.\n\n**PLAYER ON LEFT IS PLAYER A**\n\n"
     reply_string = ""
     for match in match_list:
         for member in member_list:
@@ -176,7 +179,7 @@ async def listmatches(ctx:commands.Context, group, round, second_round=None):
                 match.p1_discord_id = member["member_id"]
             elif str(member["member_name"]).lower() == str(match.p2_discord).lower():
                 match.p2_discord_id = member["member_id"]
-        reply_string += f"[Round {match.round}] [Group {match.group}] - <@!{match.p1_discord_id}> [{match.p1_race}] VS <@!{match.p2_discord_id}> [{match.p2_race}]"
+        reply_string += f"<@!{match.p1_discord_id}> [{match.p1_race}] VS <@!{match.p2_discord_id}> [{match.p2_race}]"
         if match.state == 'complete':
             reply_string += f" [{match.state.upper()}: {match.score}]"
         reply_string += "\n"
@@ -194,13 +197,61 @@ async def listmatches(ctx:commands.Context, group, round, second_round=None):
                     match.p1_discord_id = member["member_id"]
                 elif str(member["member_name"]).lower() == str(match.p2_discord).lower():
                     match.p2_discord_id = member["member_id"]
-            reply_string += f"[Round {match.round}] [Group {match.group}] - <@!{match.p1_discord_id}> [{match.p1_race}] VS <@!{match.p2_discord_id}> [{match.p2_race}]"
+            reply_string += f"<@!{match.p1_discord_id}> [{match.p1_race}] VS <@!{match.p2_discord_id}> [{match.p2_race}]"
             if match.state == 'complete':
                 reply_string += f" [{match.state.upper()}: {match.score}]"
             reply_string += "\n"
 
-    await ctx.reply(f"**GROUP {match.group.upper()} - ROUND {round}**\n{reply_string}")
+    await ctx.reply(f"{info_string}**GROUP {match.group.upper()} - ROUND {round}**\n{reply_string}")
 
+
+@bot.command(name="incomplete")
+@commands.has_role("FoM League Admin")
+async def incomplete(ctx:commands.Context, group, round, second_round=None):
+    challonge.set_credentials("debaser19", config.CHALLONGE_KEY)
+    tournament = challonge.tournaments.show(config.FOML_S3_ID)
+
+    matches = challonge_commands.fetch_matches(tournament)
+    member_list = get_members(guild)
+    match_list = []
+    for match in matches:
+        if match.group.lower() == group.lower() and int(match.round) == int(round) and match.state != "complete":
+            match_list.append(match)
+
+    channel_links_and_info = 879207158477127702
+    channel_rules_and_faq = 879208033417330709
+    info_string = f"**INCOMPLETE MATHES** (Round {round} {'+ ' + second_round if second_round else ''} in Challonge)\n\nThe following matches have **NOT** yet been completed. Please reach out to your opponent ASAP to get these matches completed. If you are having trouble scheduling, please message an admin. Check <#{channel_rules_and_faq}> and <#{channel_links_and_info}> for more information on the veto process (or type `!veto` in this server for veto rules), map pool, and more.\n\n**PLAYER ON LEFT IS PLAYER A**\n\n"
+    reply_string = ""
+    for match in match_list:
+        for member in member_list:
+            if str(member["member_name"]).lower() == str(match.p1_discord).lower():
+                match.p1_discord_id = member["member_id"]
+            elif str(member["member_name"]).lower() == str(match.p2_discord).lower():
+                match.p2_discord_id = member["member_id"]
+        reply_string += f"<@!{match.p1_discord_id}> [{match.p1_race}] VS <@!{match.p2_discord_id}> [{match.p2_race}]"
+        if match.state == 'complete':
+            reply_string += f" [{match.state.upper()}: {match.score}]"
+        reply_string += "\n"
+
+    if second_round:
+        match_list = []
+        reply_string += f"\n\n **GROUP {match.group} - ROUND {second_round}**\n"
+        for match in matches:
+            if match.group.lower() == group.lower() and int(match.round) == int(second_round) and match.state != "complete":
+                match_list.append(match)
+        
+        for match in match_list:
+            for member in member_list:
+                if str(member["member_name"]).lower() == str(match.p1_discord).lower():
+                    match.p1_discord_id = member["member_id"]
+                elif str(member["member_name"]).lower() == str(match.p2_discord).lower():
+                    match.p2_discord_id = member["member_id"]
+            reply_string += f"<@!{match.p1_discord_id}> [{match.p1_race}] VS <@!{match.p2_discord_id}> [{match.p2_race}]"
+            if match.state == 'complete':
+                reply_string += f" [{match.state.upper()}: {match.score}]"
+            reply_string += "\n"
+
+    await ctx.reply(f"{info_string}**GROUP {match.group.upper()} - ROUND {round}**\n{reply_string}")
 
 # @bot.command(name="getmembers")
 # async def getmembers(ctx:commands.Context):
