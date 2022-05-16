@@ -74,6 +74,7 @@ def get_players_list():
 
 @bot.command(name='stats')
 async def stats(ctx:commands.Context, user):
+    channel_stats_check = 975799340733984838
     if ctx.channel.name == ("stats-check"):
         players = get_players_list()
         for player in players:
@@ -101,6 +102,9 @@ async def stats(ctx:commands.Context, user):
                     embed.set_thumbnail(url='attachment://fom_s2_champ.png')
 
                 await ctx.reply(embed=embed, file=champ_logo)
+    
+    else:
+        await ctx.reply(f"Please use the <#{channel_stats_check}> channel for this command")
 
 
 @bot.command(name='mannerpoints', aliases=['mp'])
@@ -173,6 +177,7 @@ async def listmatches(ctx:commands.Context, group, round, second_round=None):
     channel_links_and_info = 879207158477127702
     channel_rules_and_faq = 879208033417330709
     channel_report_results = 879209532100857856
+    channel_scheduled_games = 938137398565556224
     info_string = f"**MATCHUPS FOR THIS WEEK** (Round {round} {'+ ' + second_round if second_round else ''} in Challonge)\n\nPlease complete these games (BO3) by the end of Sunday. Check <#{channel_rules_and_faq}> and <#{channel_links_and_info}> for more information on the veto process (or type `!veto` in this server for veto rules), map pool, and more.\n\n**PLAYER ON LEFT IS PLAYER A**\n\n"
     reply_string = ""
     for match in match_list:
@@ -204,7 +209,7 @@ async def listmatches(ctx:commands.Context, group, round, second_round=None):
                 reply_string += f" [{match.state.upper()}: {match.score}]"
             reply_string += "\n"
 
-    post_string = f"\n\nWhen you and your opponent decide on a match time post the times here and in scheduled-games.\n\nOnce your match is completed, please post your replays in <#{channel_report_results}> and report your results on Challonge: http://challonge.com/FOMLS3"
+    post_string = f"\n\nWhen you and your opponent decide on a match time post the times here and in <#{channel_scheduled_games}>.\n\nOnce your match is completed, please post your replays in <#{channel_report_results}> and report your results on Challonge: http://challonge.com/FOMLS3"
 
     await ctx.reply(f"{info_string}**GROUP {match.group.upper()} - ROUND {round}**\n{reply_string}{post_string}")
 
