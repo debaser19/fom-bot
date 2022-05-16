@@ -74,32 +74,33 @@ def get_players_list():
 
 @bot.command(name='stats')
 async def stats(ctx:commands.Context, user):
-    players = get_players_list()
-    for player in players:
-        player_tags = [player.name.lower(), player.bnet_name.lower(), player.w3c_tag.lower, player.discord_name.lower()]
-        if user.lower() in player_tags:
-            content_string = f'**Name**: {player.name}\n**W3C**: {player.w3c_tag}\n**Discord**: {player.discord_name}\n**Rank**: {player.rank}\n**Race**: {player.race}\n**Wins**: {player.wins}\n**Losses**: {player.losses}\n**Win%**: {player.win_pct}\n**Seasons Played**: {player.seasons}\n**S1 MP**: {player.s1_mp}\n**S2 MP**: {player.s2_mp}\n**S3 MP**: {player.s3_mp}\n**Total MP**: {player.total_mp}'
-            embed = discord.Embed(
-                title=f"{user} Stats",
-                colour=0x0C2C55,
-                description=content_string
-            )
+    if ctx.channel.name == ("stats-check"):
+        players = get_players_list()
+        for player in players:
+            player_tags = [player.name.lower(), player.bnet_name.lower(), player.w3c_tag.lower, player.discord_name.lower()]
+            if user.lower() in player_tags:
+                content_string = f'**Name**: {player.name}\n**W3C**: {player.w3c_tag}\n**Discord**: {player.discord_name}\n**Rank**: {player.rank}\n**Race**: {player.race}\n**Wins**: {player.wins}\n**Losses**: {player.losses}\n**Win%**: {player.win_pct}\n**Seasons Played**: {player.seasons}\n**S1 MP**: {player.s1_mp}\n**S2 MP**: {player.s2_mp}\n**S3 MP**: {player.s3_mp}\n**Total MP**: {player.total_mp}'
+                embed = discord.Embed(
+                    title=f"{user} Stats",
+                    colour=0x0C2C55,
+                    description=content_string
+                )
 
-            fom_logo = 'https://s3.amazonaws.com/challonge_app/organizations/images/000/143/459/large/discord_icon.png'
-            embed.set_author(name='Fountain of Manner', icon_url=fom_logo)
-            champ_logo = None
+                fom_logo = 'https://s3.amazonaws.com/challonge_app/organizations/images/000/143/459/large/discord_icon.png'
+                embed.set_author(name='Fountain of Manner', icon_url=fom_logo)
+                champ_logo = None
 
-            if player.s1_champ == 'YES':
-                champ_logo = discord.File('./images/fom_s1_champ.png', filename='fom_s1_champ.png')
-                embed.set_thumbnail(url='attachment://fom_s1_champ.png')
-            if player.s2_champ == 'YES':
-                champ_logo = discord.File('./images/fom_s2_champ.png', filename='fom_s2_champ.png')
-                embed.set_thumbnail(url='attachment://fom_s2_champ.png')
-            if player.s3_champ == 'YES':
-                champ_logo = discord.File('./images/fom_s2_champ.png', filename='fom_s2_champ.png')
-                embed.set_thumbnail(url='attachment://fom_s2_champ.png')
+                if player.s1_champ == 'YES':
+                    champ_logo = discord.File('./images/fom_s1_champ.png', filename='fom_s1_champ.png')
+                    embed.set_thumbnail(url='attachment://fom_s1_champ.png')
+                if player.s2_champ == 'YES':
+                    champ_logo = discord.File('./images/fom_s2_champ.png', filename='fom_s2_champ.png')
+                    embed.set_thumbnail(url='attachment://fom_s2_champ.png')
+                if player.s3_champ == 'YES':
+                    champ_logo = discord.File('./images/fom_s2_champ.png', filename='fom_s2_champ.png')
+                    embed.set_thumbnail(url='attachment://fom_s2_champ.png')
 
-            await ctx.reply(embed=embed, file=champ_logo)
+                await ctx.reply(embed=embed, file=champ_logo)
 
 
 @bot.command(name='mannerpoints', aliases=['mp'])
