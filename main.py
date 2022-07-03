@@ -19,7 +19,7 @@ def get_fom_sheet():
 
 
 class Player:
-    def __init__(self, name, race, wins, losses, win_pct, seasons, s1_champ, s2_champ, s3_champ, s1_mp, s2_mp, s3_mp, total_mp, rank, bnet_name, w3c_tag, discord_name):
+    def __init__(self, name, race, wins, losses, win_pct, seasons, s1_champ, s2_champ, s3_champ, aliases, s1_mp, s2_mp, s3_mp, total_mp, rank, bnet_name, w3c_tag, discord_name):
         self.name = name
         self.race = race
         self.wins = wins
@@ -29,6 +29,7 @@ class Player:
         self.s1_champ = s1_champ
         self.s2_champ = s2_champ
         self.s3_champ = s3_champ
+        self.aliases = aliases
         self.s1_mp = s1_mp
         self.s2_mp = s2_mp
         self.s3_mp = s3_mp
@@ -58,6 +59,7 @@ def get_players_list():
                 record.get('S1 CHAMP'),
                 record.get('S2 CHAMP'),
                 record.get('S3 CHAMP'),
+                record.get('Aliases').split(','),
                 record.get('s1 MP'),
                 record.get('s2 MP'),
                 record.get('s3 MP'),
@@ -75,10 +77,14 @@ def get_players_list():
 @bot.command(name='stats')
 async def stats(ctx:commands.Context, user):
     channel_stats_check = 975799340733984838
-    if ctx.channel.name == ("stats-check"):
+    channel_bot_test = 963256852613832734
+    if ctx.channel.name == ("stats-check") or ctx.channel.id == channel_bot_test:
         players = get_players_list()
         for player in players:
             player_tags = [player.name.lower(), player.bnet_name.lower(), player.w3c_tag.lower, player.discord_name.lower()]
+            for alias in player.aliases:
+                print(alias)
+                player_tags.append(alias.lower())
             if user.lower() in player_tags:
                 content_string = f'**Name**: {player.name}\n**W3C**: {player.w3c_tag}\n**Discord**: {player.discord_name}\n**Rank**: {player.rank}\n**Race**: {player.race}\n**Wins**: {player.wins}\n**Losses**: {player.losses}\n**Win%**: {player.win_pct}\n**Seasons Played**: {player.seasons}\n**S1 MP**: {player.s1_mp}\n**S2 MP**: {player.s2_mp}\n**S3 MP**: {player.s3_mp}\n**Total MP**: {player.total_mp}'
                 embed = discord.Embed(
