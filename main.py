@@ -98,8 +98,8 @@ async def stats(ctx:commands.Context, user):
                     champ_logo = discord.File('./images/fom_s2_champ.png', filename='fom_s2_champ.png')
                     embed.set_thumbnail(url='attachment://fom_s2_champ.png')
                 if player.s3_champ == 'YES':
-                    champ_logo = discord.File('./images/fom_s2_champ.png', filename='fom_s2_champ.png')
-                    embed.set_thumbnail(url='attachment://fom_s2_champ.png')
+                    champ_logo = discord.File('./images/fom_s3_champ.png', filename='fom_s3_champ.png')
+                    embed.set_thumbnail(url='attachment://fom_s3_champ.png')
 
                 await ctx.reply(embed=embed, file=champ_logo)
     
@@ -262,12 +262,18 @@ async def incomplete(ctx:commands.Context, group, round, second_round=None):
 
     await ctx.reply(f"{info_string}**GROUP {match.group.upper()} - ROUND {round}**\n{reply_string}")
 
-# @bot.command(name="getmembers")
-# async def getmembers(ctx:commands.Context):
-#     member_list = get_members(guild)
-#     for member in member_list:
-#         print(member["member_id"], member["member_name"])
-#         await ctx.send(f"tagging <@!{member['member_id']}>")
+
+# Veto commands
+# TODO: Add a way to start veto process between two players
+@bot.command(name="startveto")
+async def startveto(ctx:commands.Context, player_a, player_b):
+    map_pool = ["AL", "CH", "EI", "LR", "NI", "SG", "TH", "ST", "RC"]
+
+    async def veto_process(m):
+        await ctx.reply(f"Starting map veto process between {player_a} and {player_b}\nVeto order: A B A B B A")
+        await ctx.reply(f"{player_a} pick a map to veto")
+
+
 
 
 def get_members(guild):
