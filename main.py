@@ -374,7 +374,7 @@ async def claim(ctx: commands.Context, match_id, twitch_name):
 
     matchups_list = matchups.get_uncasted_matches()
     for match in matchups_list:
-        if match.id == match_id:
+        if int(match.id) == int(match_id):
             if match.stream != "":
                 await ctx.reply(f"Match {match.id} already claiemed by {match.stream}")
                 return
