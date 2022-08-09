@@ -383,7 +383,7 @@ async def claim(ctx: commands.Context, match_id, twitch_name):
                 gc = gspread.service_account(filename=config.SERVICE_ACCOUNT_FILE)
                 sh = gc.open_by_url(config.MATCHUPS_SHEET)
                 sheet = sh.worksheet("s4")
-                game_id_row = sheet.find(str(match.id))
+                game_id_row = sheet.find(str(match.id)).row
                 match.stream = twitch_name
                 # update stream column in google sheet with twitch name
                 sheet.update_cell(game_id_row, 10, twitch_name)
