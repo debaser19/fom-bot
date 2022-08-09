@@ -113,7 +113,7 @@ def get_uncasted_matches():
         # remove matchups that have no date, are in the past, or more than one hour away
         if (
             matchup.datetime is not None
-            and matchup.stream != ""
+            and matchup.stream == ""
             and matchup.datetime > datetime.now()
         ):
             # print(f"Removing matchup: {matchup}")
