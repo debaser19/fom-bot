@@ -4,7 +4,9 @@ import config
 
 
 class Player:
-    def __init__(self, id, name, discord_tag, bnet_tag, seed, group, race, w3c_link, region):
+    def __init__(
+        self, id, name, discord_tag, bnet_tag, seed, group, race, w3c_link, region
+    ):
         self.id = id
         self.name = name
         self.discord_tag = discord_tag
@@ -17,7 +19,24 @@ class Player:
 
 
 class Match:
-    def __init__(self, id, group, round, p1_id, p1_name, p1_discord, p1_region, p1_race, p2_id, p2_name, p2_discord, p2_region, p2_race, state, score):
+    def __init__(
+        self,
+        id,
+        group,
+        round,
+        p1_id,
+        p1_name,
+        p1_discord,
+        p1_region,
+        p1_race,
+        p2_id,
+        p2_name,
+        p2_discord,
+        p2_region,
+        p2_race,
+        state,
+        score,
+    ):
         self.id = id
         self.group = group
         self.round = round
@@ -39,42 +58,41 @@ class Match:
 
 def fetch_group(seed):
     if seed in range(1, 9):
-        return 'A'
+        return "A"
     elif seed in range(9, 17):
-        return 'B'
+        return "B"
     elif seed in range(17, 25):
-        return 'C'
+        return "C"
     elif seed in range(25, 33):
-        return 'D'
+        return "D"
     elif seed in range(33, 41):
-        return 'E'
+        return "E"
     elif seed in range(41, 49):
-        return 'F'
+        return "F"
     elif seed in range(49, 57):
-        return 'G'
+        return "G"
     elif seed in range(57, 65):
-        return 'H'
+        return "H"
     elif seed in range(65, 73):
-        return 'I'
+        return "I"
     elif seed in range(73, 81):
-        return 'J'
+        return "J"
     elif seed in range(81, 89):
-        return 'K'
+        return "K"
     elif seed in range(89, 97):
-        return 'L'
+        return "L"
     elif seed in range(97, 105):
-        return 'M'
+        return "M"
     elif seed in range(105, 113):
-        return 'N'
+        return "N"
     elif seed in range(113, 121):
-        return 'O'
+        return "O"
     elif seed in range(121, 129):
-        return 'P'
+        return "P"
     elif seed in range(129, 137):
-        return 'Q'
+        return "Q"
     else:
-        return 'WAITLIST'
-    
+        return "WAITLIST"
 
 
 def fetch_players(tournament):
@@ -92,11 +110,13 @@ def fetch_players(tournament):
                     fetch_group(player["seed"]),
                     player["custom_field_response"]["29917"],
                     player["custom_field_response"]["29918"],
-                    player["custom_field_response"]["29919"]
+                    player["custom_field_response"]["29919"],
                 )
             )
         except Exception as err:
-            print(f"Missing info for player {player['name']} - adding blank values: {err}")
+            print(
+                f"Missing info for player {player['name']} - adding blank values: {err}"
+            )
             player_list.append(
                 Player(
                     player["id"],
@@ -107,7 +127,7 @@ def fetch_players(tournament):
                     "fake_group",
                     "fake_race",
                     "fake_w3c_link",
-                    "fake_region"
+                    "fake_region",
                 )
             )
 
@@ -120,7 +140,11 @@ def fetch_matches(tournament):
 
     matches_list = []
     for match in matches:
-        p1_discord_tag = p1_name = p1_race = p1_region = p2_discord_tag = p2_name = p2_race = p2_region = "blank"
+        p1_discord_tag = (
+            p1_name
+        ) = (
+            p1_race
+        ) = p1_region = p2_discord_tag = p2_name = p2_race = p2_region = "blank"
         for player in players:
             # print(f"{match['player1_id']} - {player.id}")
             if match["player1_id"] == player.id:
@@ -138,7 +162,7 @@ def fetch_matches(tournament):
                 p2_discord_tag = player.discord_tag
                 p2_race = player.race
                 p2_region = player.region
-                
+
         matches_list.append(
             Match(
                 match["id"],
@@ -155,14 +179,11 @@ def fetch_matches(tournament):
                 p2_region,
                 p2_race,
                 match["state"],
-                match["scores_csv"]
+                match["scores_csv"],
             )
         )
-    
+
     return matches_list
-
-
-
 
 
 # def main():
