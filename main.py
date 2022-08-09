@@ -368,6 +368,32 @@ async def upcoming(ctx: commands.Context):
         print("No upcoming matches without caster")
 
 
+@bot.command(name="claim")
+async def claim(ctx: commands.Context, match_id, twitch_name):
+    import matchups
+
+    matchups_list = matchups.get_uncasted_matches()
+    for match in matchups_list:
+        if match.id == match_id:
+            if match.stream != "":
+                await ctx.reply(f"Match {match.id} already claiemed by {match.stream}")
+                return
+            try:
+                # find game id in ID column of google sheet
+                gc = gspread.service_account(filename=config.SERVICE_ACCOUNT_FILE)
+                sh = gc.open_by_url(config.MATCHUPS_SHEET)
+                sheet = sh.worksheet("s4")
+                game_id_row = sheet.find(match.id).row
+                match.stream = twitch_name
+                # update stream column in google sheet with twitch name
+                sheet.update_cell(game_id_row, 10, twitch_name)
+                await ctx.reply(f"Match {match_id} claimed by {twitch_name}")
+                return
+            except Exception as e:
+                await ctx.reply(f"Error claiming match: {e}")
+                return
+
+
 def get_members(guild):
     member_list = []
     for member in guild.members:
