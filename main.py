@@ -349,10 +349,10 @@ async def upcoming(ctx: commands.Context):
             # convert match["datetime"] to unix timestamp
             match_date = int(match.datetime.timestamp())
             match_date = f"<t:{match_date}:f>"
-            result += f"**{match.p1_name}** vs **{match.p2_name}** - {match_date}"
+            result += f"**{match.p1_name} [P{match.p1_race}]** vs **{match.p2_name} [{match.p2_race}]** - {match_date}"
 
-            if match.caster != "":
-                result += f" - <https://twitch.tv/{match.caster}>\n"
+            if match.stream != "":
+                result += f" - <https://twitch.tv/{match.stream}>\n"
             else:
                 result += f" - No caster scheduled yet\n"
 
