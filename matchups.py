@@ -74,6 +74,3 @@ def get_upcoming_matches():
             matchup.stream,
         )
     return new_matchups_list
-
-
-get_upcoming_matches()
