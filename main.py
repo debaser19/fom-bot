@@ -488,7 +488,7 @@ async def on_ready():
     global guild
     guild = bot.get_guild(int(config.FOM_GUILD_ID))
     print(f"We have logged in as {bot.user}")
-    # check_scheduled_matches.start()
+    check_scheduled_matches.start()
     update_stream_schedule.start()
 
 
