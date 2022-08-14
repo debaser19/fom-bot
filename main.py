@@ -411,7 +411,7 @@ async def check_scheduled_matches():
             match_date = f"<t:{match_date}:f>"
             result += f"[ID: {match.id}] [GROUP: {match.group}] **{match.p1_name} [{match.p1_race}]** vs **{match.p2_name} [{match.p2_race}]** - {match_date}"
 
-            if match["caster"] != "":
+            if match.stream != "":
                 result += f" - <https://twitch.tv/{match.stream}>\n"
             else:
                 result += f" - No {caster_role} scheduled yet\ - claim match with `!claim {match.id} <twitch_name>n"
