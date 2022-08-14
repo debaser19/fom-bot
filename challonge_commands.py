@@ -91,8 +91,6 @@ def fetch_group(seed):
         return "P"
     elif seed in range(129, 137):
         return "Q"
-    elif seed in range(137, 145):
-        return "R"
     else:
         return "WAITLIST"
 
