@@ -393,6 +393,7 @@ async def claim(ctx: commands.Context, match_id, twitch_name):
                 await ctx.reply(f"Error claiming match: {e}")
                 return
 
+
 @tasks.loop(hours=12)
 async def check_scheduled_matches():
     channel = bot.get_channel(881917059905253386)  # gym-newbie-league
@@ -414,13 +415,46 @@ async def check_scheduled_matches():
             if match.stream != "":
                 result += f" - <https://twitch.tv/{match.stream}>\n"
             else:
-                result += f" - No {caster_role} scheduled yet\ - claim match with `!claim {match.id} <twitch_name>n"
+                result += f" - No {caster_role} scheduled yet\ - claim match with `!claim {match.id} <twitch_name>`\n"
 
         await channel.send(
             f"**Matches scheduled in the next 24 hours**:\nMatch times should be automatically converted to your timezone\n\n{result}"
         )
     else:
         print("No upcoming matches without caster")
+
+
+@tasks.loop(minutes=10)
+async def update_stream_schedule():
+    print("Updating stream schedule...")
+
+    # get last message id
+    channel = bot.get_channel(879207644399816704)
+    message_id = channel.last_message_id
+    message = await channel.fetch_message(message_id)
+
+    # fetch list of scheduled matches
+    import matchups
+    from datetime import datetime
+
+    upcoming_matches = matchups.get_weekly_matches()
+    if len(upcoming_matches) > 0:
+        print("Listing matches upcoming in the next 24 hours")
+        result = ""
+        for match in upcoming_matches:
+            match_date = int(match.datetime.timestamp())
+            match_date = f"<t:{match_date}:f>"
+            if match.datetime < datetime.now():
+                result += f"~~[GROUP {match.group}] **{match.p1_name} [{match.p1_race}]** vs **{match.p2_name} [{match.p2_race}]** - {match_date}~~"
+            else:
+                result += f"[GROUP {match.group}] **{match.p1_name} [{match.p1_race}]** vs **{match.p2_name} [{match.p2_race}]** - {match_date}"
+
+            if match.stream != "":
+                result += f" - <https://twitch.tv/{match.stream}>\n"
+            else:
+                result += f" - No caster scheduled yet - claim match with `!claim {match.id} <twitch_name>`\n"
+
+    await message.edit(content=result)
 
 
 @bot.command(name="hotdog")
@@ -454,7 +488,8 @@ async def on_ready():
     global guild
     guild = bot.get_guild(int(config.FOM_GUILD_ID))
     print(f"We have logged in as {bot.user}")
-    check_scheduled_matches.start()
+    # check_scheduled_matches.start()
+    update_stream_schedule.start()
 
 
 DISCORD_TOKEN = config.DISCORD_TOKEN
