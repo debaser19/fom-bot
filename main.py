@@ -407,14 +407,14 @@ async def check_scheduled_matches():
             # convert match["datetime"] to string containing date and time
             # match_date = match["datetime"].strftime("%a %d %b @ %I:%M %p EST")
             # convert match["datetime"] to unix timestamp
-            match_date = int(match["datetime"].timestamp())
+            match_date = int(match.datetime.timestamp())
             match_date = f"<t:{match_date}:f>"
-            result += f"**{match['p1_name']}** vs **{match['p2_name']}** - {match_date}"
+            result += f"[ID: {match.id}] [GROUP: {match.group}] **{match.p1_name} [{match.p1_race}]** vs **{match.p2_name} [{match.p2_race}]** - {match_date}"
 
             if match["caster"] != "":
-                result += f" - <https://twitch.tv/{match['caster']}>\n"
+                result += f" - <https://twitch.tv/{match.stream}>\n"
             else:
-                result += f" - No {caster_role} scheduled yet\n"
+                result += f" - No {caster_role} scheduled yet\ - claim match with `!claim {match.id} <twitch_name>n"
 
         await channel.send(
             f"**Matches scheduled in the next 24 hours**:\nMatch times should be automatically converted to your timezone\n\n{result}"
