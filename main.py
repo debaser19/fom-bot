@@ -253,7 +253,7 @@ async def listmatches(ctx: commands.Context, group, round, second_round=None):
                 reply_string += f" [{match.state.upper()}: {match.score}]"
             reply_string += "\n"
 
-    post_string = f"\n\nWhen you and your opponent decide on a match time post the times here and in <#{channel_scheduled_games}>.\n\nOnce your match is completed, please post your replays in <#{channel_report_results}> and report your results on Challonge: http://challonge.com/FOMLS3"
+    post_string = f"\n\nWhen you and your opponent decide on a match time post the times here and in <#{channel_scheduled_games}>.\n\nOnce your match is completed, please post your replays in <#{channel_report_results}> and report your results on Challonge: http://challonge.com/FOMLS4"
 
     await ctx.reply(
         f"{info_string}**GROUP {match.group.upper()} - ROUND {round}**\n{reply_string}{post_string}"
