@@ -393,6 +393,10 @@ async def claim(ctx: commands.Context, match_id, twitch_name):
                 await ctx.reply(f"Error claiming match: {e}")
                 return
 
+@bot.command(name="hotdog")
+async def hotdog(ctx: commands.Context):
+    await ctx.reply(file=discord.File("assets/hotdog.gif"))
+
 
 def get_members(guild):
     member_list = []
