@@ -188,7 +188,7 @@ def fetch_matches(tournament):
 
 # def main():
 #     challonge.set_credentials("debaser19", config.CHALLONGE_KEY)
-#     tournament = challonge.tournaments.show(config.FOML_S3_ID)
+#     tournament = challonge.tournaments.show(config.FOML_S4_ID)
 
 #     # players = fetch_players(tournament)
 #     # for player in players:

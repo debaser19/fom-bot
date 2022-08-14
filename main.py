@@ -205,7 +205,7 @@ async def leaderboard(ctx: commands.Context, limit=15):
 @commands.has_role("FoM League Admin")
 async def listmatches(ctx: commands.Context, group, round, second_round=None):
     challonge.set_credentials("debaser19", config.CHALLONGE_KEY)
-    tournament = challonge.tournaments.show(config.FOML_S3_ID)
+    tournament = challonge.tournaments.show(config.FOML_S4_ID)
 
     matches = challonge_commands.fetch_matches(tournament)
     member_list = get_members(guild)
@@ -264,7 +264,7 @@ async def listmatches(ctx: commands.Context, group, round, second_round=None):
 @commands.has_role("FoM League Admin")
 async def incomplete(ctx: commands.Context, group, round, second_round=None):
     challonge.set_credentials("debaser19", config.CHALLONGE_KEY)
-    tournament = challonge.tournaments.show(config.FOML_S3_ID)
+    tournament = challonge.tournaments.show(config.FOML_S4_ID)
 
     matches = challonge_commands.fetch_matches(tournament)
     member_list = get_members(guild)
