@@ -91,6 +91,8 @@ def fetch_group(seed):
         return "P"
     elif seed in range(129, 137):
         return "Q"
+    elif seed in range(137, 145):
+        return "R"
     else:
         return "WAITLIST"
 
@@ -104,13 +106,13 @@ def fetch_players(tournament):
                 Player(
                     player["group_player_ids"][0],
                     player["name"],
-                    player["custom_field_response"]["29915"],
-                    player["custom_field_response"]["29916"],
+                    player["custom_field_response"]["34929"],
+                    player["custom_field_response"]["34930"],
                     player["seed"],
                     fetch_group(player["seed"]),
-                    player["custom_field_response"]["29917"],
-                    player["custom_field_response"]["29918"],
-                    player["custom_field_response"]["29919"],
+                    player["custom_field_response"]["34931"],
+                    player["custom_field_response"]["34932"],
+                    player["custom_field_response"]["34933"],
                 )
             )
         except Exception as err:
