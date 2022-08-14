@@ -1,4 +1,4 @@
-from discord.ext import commands
+from discord.ext import commands, tasks
 import discord
 import gspread
 from table2ascii import table2ascii as t2a, PresetStyle
@@ -393,6 +393,36 @@ async def claim(ctx: commands.Context, match_id, twitch_name):
                 await ctx.reply(f"Error claiming match: {e}")
                 return
 
+@tasks.loop(hours=12)
+async def check_scheduled_matches():
+    channel = bot.get_channel(881917059905253386)  # gym-newbie-league
+    caster_role = "<@&989262891641352333>"
+    import matchups
+
+    upcoming_matches = matchups.get_upcoming_matches()
+    if len(upcoming_matches) > 0:
+        print("Listing matches upcoming in the next 24 hours")
+        result = ""
+        for match in upcoming_matches:
+            # convert match["datetime"] to string containing date and time
+            # match_date = match["datetime"].strftime("%a %d %b @ %I:%M %p EST")
+            # convert match["datetime"] to unix timestamp
+            match_date = int(match["datetime"].timestamp())
+            match_date = f"<t:{match_date}:f>"
+            result += f"**{match['p1_name']}** vs **{match['p2_name']}** - {match_date}"
+
+            if match["caster"] != "":
+                result += f" - <https://twitch.tv/{match['caster']}>\n"
+            else:
+                result += f" - No {caster_role} scheduled yet\n"
+
+        await channel.send(
+            f"**Matches scheduled in the next 24 hours**:\nMatch times should be automatically converted to your timezone\n\n{result}"
+        )
+    else:
+        print("No upcoming matches without caster")
+
+
 @bot.command(name="hotdog")
 async def hotdog(ctx: commands.Context):
     await ctx.reply(file=discord.File("assets/hotdog.gif"))
@@ -424,6 +454,7 @@ async def on_ready():
     global guild
     guild = bot.get_guild(int(config.FOM_GUILD_ID))
     print(f"We have logged in as {bot.user}")
+    check_scheduled_matches.start()
 
 
 DISCORD_TOKEN = config.DISCORD_TOKEN
