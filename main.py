@@ -446,13 +446,12 @@ async def update_stream_schedule():
 
     upcoming_matches = matchups.get_weekly_matches()
     if len(upcoming_matches) > 0:
-        logger.info("Listing matches upcoming in the next 4 days")
         result = ""
         for match in upcoming_matches:
             match_date = int(match.datetime.timestamp())
             match_date = f"<t:{match_date}:f>"
             if match.datetime < datetime.now():
-                result += f"~~[{match.group}] **{match.p1_name} [{match.p1_race}]** vs **{match.p2_name} [{match.p2_race}]** - {match_date}~~"
+                result += f"_[{match.group}] **{match.p1_name} [{match.p1_race}]** vs **{match.p2_name} [{match.p2_race}]** - {match_date}_"
             else:
                 result += f"[{match.group}] **{match.p1_name} [{match.p1_race}]** vs **{match.p2_name} [{match.p2_race}]** - {match_date}"
 

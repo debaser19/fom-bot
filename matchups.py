@@ -109,7 +109,7 @@ def get_weekly_matches():
         # remove matchups that have no date, are in the past, or more than one hour away
         if (
             matchup.datetime is not None
-            and matchup.datetime > datetime.now()
+            and matchup.datetime > datetime.now() - timedelta(hours=1)
             and matchup.datetime < datetime.now() + timedelta(days=4)
         ):
             logger.info(f"Adding matchup: {matchup}")
