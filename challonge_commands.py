@@ -115,7 +115,7 @@ def fetch_players(tournament):
                 )
             )
         except Exception as err:
-            logger.warning(
+            logger().warning(
                 f"Missing info for player {player['name']} - adding blank values: {err}"
             )
             player_list.append(

@@ -22,7 +22,10 @@ def logger():
     logFormatter = logging.Formatter("%asctime)s %(message)s")
     consoleHandler = logging.StreamHandler(stdout)
     consoleHandler.setFormatter(logFormatter)
+    fileHandler = logging.FileHandler(filename="bot.log", encoding="utf-8", mode="a")
+    fileHandler.setFormatter(logFormatter)
     logger.addHandler(consoleHandler)
+    logger.addHandler(fileHandler)
 
     return logger
 
@@ -118,7 +121,7 @@ def get_players_list():
 
 @bot.command(name="stats")
 async def stats(ctx: commands.Context, user):
-    logger.info(f"Discord user {ctx.author} requested stats for {user}")
+    logger().info(f"Discord user {ctx.author} requested stats for {user}")
     channel_stats_check = 975799340733984838
     channel_bot_test = 963256852613832734
     if ctx.channel.name == ("stats-check") or ctx.channel.id == channel_bot_test:
@@ -362,7 +365,7 @@ async def upcoming(ctx: commands.Context):
 
     upcoming_matches = matchups.get_upcoming_matches()
     if len(upcoming_matches) > 0:
-        logger.info("Listing matches upcoming in the next 24 hours")
+        logger().info("Listing matches upcoming in the next 24 hours")
         result = ""
         for match in upcoming_matches:
             # convert match["datetime"] to string containing date and time
@@ -386,7 +389,7 @@ async def upcoming(ctx: commands.Context):
     else:
         await message.delete()
         await ctx.reply("No matches scheduled in the next 24 hours")
-        logger.info("No upcoming matches without caster")
+        logger().info("No upcoming matches without caster")
 
 
 @bot.command(name="claim")
@@ -423,7 +426,7 @@ async def check_scheduled_matches():
 
     upcoming_matches = matchups.get_upcoming_matches()
     if len(upcoming_matches) > 0:
-        logger.info("Checking for matches scheduled in the next 24 hours")
+        logger().info("Checking for matches scheduled in the next 24 hours")
         result = ""
         for match in upcoming_matches:
             # convert match["datetime"] to string containing date and time
@@ -442,12 +445,12 @@ async def check_scheduled_matches():
             f"**Matches scheduled in the next 24 hours**:\nMatch times should be automatically converted to your timezone\n\n{result}"
         )
     else:
-        logger.info("No upcoming matches without caster")
+        logger().info("No upcoming matches without caster")
 
 
 @tasks.loop(minutes=10)
 async def update_stream_schedule():
-    logger.info("Updating stream schedule...")
+    logger().info("Updating stream schedule...")
 
     # get last message id
     channel = bot.get_channel(879207644399816704)
@@ -463,7 +466,7 @@ async def update_stream_schedule():
 
     upcoming_matches = matchups.get_weekly_matches()
     if len(upcoming_matches) > 0:
-        logger.info("Listing matches upcoming in the next 4 days")
+        logger().info("Listing matches upcoming in the next 4 days")
         result = ""
         for match in upcoming_matches:
             match_date = int(match.datetime.timestamp())
@@ -513,7 +516,7 @@ async def getserverid(ctx):
 async def on_ready():
     global guild
     guild = bot.get_guild(int(config.FOM_GUILD_ID))
-    logger.info(f"We have logged in as {bot.user}")
+    logger().info(f"We have logged in as {bot.user}")
     check_scheduled_matches.start()
     update_stream_schedule.start()
 
