@@ -67,16 +67,8 @@ def get_upcoming_matches():
             stream_string = "No caster"
         else:
             stream_string = matchup.stream
-        logging.info(
-            matchup.id,
-            matchup.datetime,
-            matchup.p1_name,
-            matchup.p1_race,
-            matchup.p2_name,
-            matchup.p2_race,
-            matchup.group,
-            stream_string,
-        )
+        matchup_string = f"[{matchup.id}] [{matchup.group}] [{matchup.datetime}] [{matchup.p1_name}] [{matchup.p1_race}] VS [{matchup.p2_name}] [{matchup.p2_race}] - {stream_string}"
+        logging.info(matchup_string)
     return new_matchups_list
 
 
@@ -131,16 +123,8 @@ def get_weekly_matches():
             stream_string = "No caster"
         else:
             stream_string = matchup.stream
-        logging.info(
-            matchup.id,
-            matchup.datetime,
-            matchup.p1_name,
-            matchup.p1_race,
-            matchup.p2_name,
-            matchup.p2_race,
-            matchup.group,
-            stream_string,
-        )
+        matchup_string = f"[{matchup.id}] [{matchup.group}] [{matchup.datetime}] [{matchup.p1_name}] [{matchup.p1_race}] VS [{matchup.p2_name}] [{matchup.p2_race}] - {stream_string}"
+        logging.info(matchup_string)
     return new_matchups_list
 
 
@@ -195,14 +179,6 @@ def get_uncasted_matches():
             stream_string = "No caster"
         else:
             stream_string = matchup.stream
-        logging.info(
-            matchup.id,
-            matchup.datetime,
-            matchup.p1_name,
-            matchup.p1_race,
-            matchup.p2_name,
-            matchup.p2_race,
-            matchup.group,
-            stream_string,
-        )
+        matchup_string = f"[{matchup.id}] [{matchup.group}] [{matchup.datetime}] [{matchup.p1_name}] [{matchup.p1_race}] VS [{matchup.p2_name}] [{matchup.p2_race}] - {stream_string}"
+        logging.info(matchup_string)
     return new_matchups_list
