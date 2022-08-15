@@ -4,6 +4,7 @@ import gspread
 from table2ascii import table2ascii as t2a, PresetStyle
 import challonge
 import logging
+import sys
 
 import string_commands
 import config
@@ -16,6 +17,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 logging.basicConfig(
     filename="bot.log",
+    stream=sys.stdout,
     format="%(asctime)s %(message)s",
     datefmt="[%m/%d/%Y %I:%M:%S %p]",
     level=logging.INFO,
