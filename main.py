@@ -337,12 +337,12 @@ async def startveto(ctx: commands.Context, player_a, player_b):
 
 @bot.command(name="upcoming")
 async def upcoming(ctx: commands.Context):
+    logger.info(f"{ctx.author} requested upcoming matches")
     message = await ctx.reply("Looking for upcoming matches...")
     import matchups
 
     upcoming_matches = matchups.get_upcoming_matches()
     if len(upcoming_matches) > 0:
-        logger.info("Listing matches upcoming in the next 24 hours")
         result = ""
         for match in upcoming_matches:
             # convert match["datetime"] to string containing date and time
