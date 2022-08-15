@@ -376,6 +376,11 @@ async def claim(ctx: commands.Context, match_id, twitch_name):
     if role in ctx.author.roles:
         fom_admin = True
         logger.info(f"{ctx.author} is an admin, user is able to claim any match")
+    else:
+        fom_admin = False
+        logger.info(
+            f"{ctx.author} is not an admin, user is not able to claim matches claimed by other casters"
+        )
 
     # check to make sure twitch_name is valid
     illegal_characters = ["<", ">", ":", ";", "!", '"', "|", "\\", "/", "?", "*"]
