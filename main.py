@@ -437,6 +437,9 @@ async def update_stream_schedule():
     import matchups
     from datetime import datetime
 
+    last_update_time = int(datetime.now().timestamp())
+    last_update_time_string = f"<t:{last_update_time}:f>"
+
     upcoming_matches = matchups.get_weekly_matches()
     if len(upcoming_matches) > 0:
         print("Listing matches upcoming in the next 24 hours")
@@ -453,6 +456,8 @@ async def update_stream_schedule():
                 result += f" - <https://twitch.tv/{match.stream}>\n"
             else:
                 result += f" - No caster scheduled yet - claim match with `!claim {match.id} <twitch_name>`\n"
+
+        result += f"\n\n *Last updated: {last_update_time_string}*"
 
     await message.edit(content=result)
 
