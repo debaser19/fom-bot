@@ -429,9 +429,6 @@ async def check_scheduled_matches():
         logger.info("Checking for matches scheduled in the next 24 hours")
         result = ""
         for match in upcoming_matches:
-            # convert match["datetime"] to string containing date and time
-            # match_date = match["datetime"].strftime("%a %d %b @ %I:%M %p EST")
-            # convert match["datetime"] to unix timestamp
             match_date = int(match.datetime.timestamp())
             match_date = f"<t:{match_date}:f>"
             result += f"[ID: {match.id}] [GROUP: {match.group}] **{match.p1_name} [{match.p1_race}]** vs **{match.p2_name} [{match.p2_race}]** - {match_date}"
@@ -516,8 +513,8 @@ async def on_ready():
     global guild
     guild = bot.get_guild(int(config.FOM_GUILD_ID))
     logger.info(f"We have logged in as {bot.user}")
-    # check_scheduled_matches.start()
-    # update_stream_schedule.start()
+    check_scheduled_matches.start()
+    update_stream_schedule.start()
 
 
 DISCORD_TOKEN = config.DISCORD_TOKEN
