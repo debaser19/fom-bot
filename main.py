@@ -19,7 +19,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 def logger():
     logger = logging.getLogger("discord")
     logger.setLevel(logging.INFO)
-    logFormatter = logging.Formatter("%asctime)s %(message)s")
+    logFormatter = logging.Formatter("%(asctime)s %(message)s")
     consoleHandler = logging.StreamHandler(stdout)
     consoleHandler.setFormatter(logFormatter)
     fileHandler = logging.FileHandler(filename="bot.log", encoding="utf-8", mode="a")
