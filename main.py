@@ -372,14 +372,34 @@ async def upcoming(ctx: commands.Context):
 @bot.command(name="claim")
 async def claim(ctx: commands.Context, match_id, twitch_name):
     logger.info(f"{ctx.author} is trying to claim match id {match_id}")
+    role = discord.utils.find(lambda r: r.name == "FoM League Admin", ctx.guild.roles)
+    if role in ctx.author.roles:
+        fom_admin = True
+        logger.info(f"{ctx.author} is an admin, user is able to claim any match")
+
+    # check to make sure twitch_name is valid
+    illegal_characters = ["<", ">", ":", ";", "!", '"', "|", "\\", "/", "?", "*"]
+    if any(char in illegal_characters for char in twitch_name):
+        logger.warning(f"{twitch_name} contains illegal characters")
+        await ctx.reply(
+            "Illegal characters in twitch name, please enter a valid twitch username "
+        )
+        return
+
     import matchups
 
-    matchups_list = matchups.get_uncasted_matches()
+    matchups_list = matchups.get_all_matches()
     for match in matchups_list:
         if int(match.id) == int(match_id):
             if match.stream != "":
-                await ctx.reply(f"Match {match.id} already claiemed by {match.stream}")
-                return
+                if fom_admin == False:
+                    logger.warning(
+                        f"Match {match_id} is already claimed by {match.stream}"
+                    )
+                    await ctx.reply(
+                        f"Match {match.id} already claiemed by {match.stream}"
+                    )
+                    return
             try:
                 # find game id in ID column of google sheet
                 gc = gspread.service_account(filename=config.SERVICE_ACCOUNT_FILE)
@@ -496,8 +516,8 @@ async def on_ready():
     global guild
     guild = bot.get_guild(int(config.FOM_GUILD_ID))
     logger.info(f"We have logged in as {bot.user}")
-    check_scheduled_matches.start()
-    update_stream_schedule.start()
+    # check_scheduled_matches.start()
+    # update_stream_schedule.start()
 
 
 DISCORD_TOKEN = config.DISCORD_TOKEN
