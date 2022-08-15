@@ -1,5 +1,5 @@
 import challonge
-from main import logger
+from fom_logger import logger
 
 import config
 

@@ -1,5 +1,5 @@
 import gspread
-from main import logger
+from fom_logger import logger
 
 import config
 
@@ -20,7 +20,7 @@ def get_upcoming_matches():
     gc = gspread.service_account(filename=config.SERVICE_ACCOUNT_FILE)
     sh = gc.open_by_url(config.MATCHUPS_SHEET)
     sheet = sh.worksheet("s4")
-    logger().info("Grabbing all matchups")
+    logger.info("Grabbing all matchups")
     records = sheet.get_all_records()
     matchups_list = []
     from datetime import datetime, timedelta
@@ -56,19 +56,19 @@ def get_upcoming_matches():
             and matchup.datetime > datetime.now()
             and matchup.datetime < datetime.now() + timedelta(hours=24)
         ):
-            logger().info(f"Adding matchup: {matchup}")
+            logger.info(f"Adding matchup: {matchup}")
             new_matchups_list.append(matchup)
 
     # sort list based on datetime value
     new_matchups_list.sort(key=lambda x: x.datetime)
-    logger().info("List of upcoming matches in the next 24 hours:")
+    logger.info("List of upcoming matches in the next 24 hours:")
     for matchup in new_matchups_list:
         if matchup.stream == "":
             stream_string = "No caster"
         else:
             stream_string = matchup.stream
         matchup_string = f"[{matchup.id}] [{matchup.group}] [{matchup.datetime}] [{matchup.p1_name}] [{matchup.p1_race}] VS [{matchup.p2_name}] [{matchup.p2_race}] - {stream_string}"
-        logger().info(matchup_string)
+        logger.info(matchup_string)
     return new_matchups_list
 
 
@@ -76,7 +76,7 @@ def get_weekly_matches():
     gc = gspread.service_account(filename=config.SERVICE_ACCOUNT_FILE)
     sh = gc.open_by_url(config.MATCHUPS_SHEET)
     sheet = sh.worksheet("s4")
-    logger().info("Grabbing all matchups")
+    logger.info("Grabbing all matchups")
     records = sheet.get_all_records()
     matchups_list = []
     from datetime import datetime, timedelta
@@ -112,19 +112,19 @@ def get_weekly_matches():
             and matchup.datetime > datetime.now()
             and matchup.datetime < datetime.now() + timedelta(days=4)
         ):
-            logger().info(f"Adding matchup: {matchup}")
+            logger.info(f"Adding matchup: {matchup}")
             new_matchups_list.append(matchup)
 
     # sort list based on datetime value
     new_matchups_list.sort(key=lambda x: x.datetime)
-    logger().info("List of upcoming matches in the next 24 hours:")
+    logger.info("List of upcoming matches in the next 24 hours:")
     for matchup in new_matchups_list:
         if matchup.stream == "":
             stream_string = "No caster"
         else:
             stream_string = matchup.stream
         matchup_string = f"[{matchup.id}] [{matchup.group}] [{matchup.datetime}] [{matchup.p1_name}] [{matchup.p1_race}] VS [{matchup.p2_name}] [{matchup.p2_race}] - {stream_string}"
-        logger().info(matchup_string)
+        logger.info(matchup_string)
     return new_matchups_list
 
 
@@ -132,7 +132,7 @@ def get_uncasted_matches():
     gc = gspread.service_account(filename=config.SERVICE_ACCOUNT_FILE)
     sh = gc.open_by_url(config.MATCHUPS_SHEET)
     sheet = sh.worksheet("s4")
-    logger().info("Grabbing all matchups")
+    logger.info("Grabbing all matchups")
     records = sheet.get_all_records()
     matchups_list = []
     from datetime import datetime, timedelta
@@ -173,12 +173,12 @@ def get_uncasted_matches():
 
     # sort list based on datetime value
     new_matchups_list.sort(key=lambda x: x.datetime)
-    logger().info("List of upcoming matches in the next 24 hours:")
+    logger.info("List of upcoming matches in the next 24 hours:")
     for matchup in new_matchups_list:
         if matchup.stream == "":
             stream_string = "No caster"
         else:
             stream_string = matchup.stream
         matchup_string = f"[{matchup.id}] [{matchup.group}] [{matchup.datetime}] [{matchup.p1_name}] [{matchup.p1_race}] VS [{matchup.p2_name}] [{matchup.p2_race}] - {stream_string}"
-        logger().info(matchup_string)
+        logger.info(matchup_string)
     return new_matchups_list
