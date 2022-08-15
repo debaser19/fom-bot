@@ -4,7 +4,7 @@ import gspread
 from table2ascii import table2ascii as t2a, PresetStyle
 import challonge
 import logging
-import sys
+from sys import stdout
 
 import string_commands
 import config
@@ -15,13 +15,24 @@ intents.members = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
-logging.basicConfig(
-    filename="bot.log",
-    format="%(asctime)s %(message)s",
-    datefmt="[%m/%d/%Y %I:%M:%S %p]",
-    level=logging.INFO,
-)
+
+def logger():
+    logger = logging.getLogger("discord")
+    logger.setLevel(logging.INFO)
+    logFormatter = logging.Formatter("%asctime)s %(message)s")
+    consoleHandler = logging.StreamHandler(stdout)
+    consoleHandler.setFormatter(logFormatter)
+    logger.addHandler(consoleHandler)
+
+    return logger
+
+
+# logging.basicConfig(
+#     filename="bot.log",
+#     format="%(asctime)s %(message)s",
+#     datefmt="[%m/%d/%Y %I:%M:%S %p]",
+#     level=logging.INFO,
+# )
 
 
 def get_fom_sheet():
@@ -107,7 +118,7 @@ def get_players_list():
 
 @bot.command(name="stats")
 async def stats(ctx: commands.Context, user):
-    logging.info(f"Discord user {ctx.author} requested stats for {user}")
+    logger.info(f"Discord user {ctx.author} requested stats for {user}")
     channel_stats_check = 975799340733984838
     channel_bot_test = 963256852613832734
     if ctx.channel.name == ("stats-check") or ctx.channel.id == channel_bot_test:
@@ -351,7 +362,7 @@ async def upcoming(ctx: commands.Context):
 
     upcoming_matches = matchups.get_upcoming_matches()
     if len(upcoming_matches) > 0:
-        logging.info("Listing matches upcoming in the next 24 hours")
+        logger.info("Listing matches upcoming in the next 24 hours")
         result = ""
         for match in upcoming_matches:
             # convert match["datetime"] to string containing date and time
@@ -375,7 +386,7 @@ async def upcoming(ctx: commands.Context):
     else:
         await message.delete()
         await ctx.reply("No matches scheduled in the next 24 hours")
-        logging.info("No upcoming matches without caster")
+        logger.info("No upcoming matches without caster")
 
 
 @bot.command(name="claim")
@@ -412,7 +423,7 @@ async def check_scheduled_matches():
 
     upcoming_matches = matchups.get_upcoming_matches()
     if len(upcoming_matches) > 0:
-        logging.info("Checking for matches scheduled in the next 24 hours")
+        logger.info("Checking for matches scheduled in the next 24 hours")
         result = ""
         for match in upcoming_matches:
             # convert match["datetime"] to string containing date and time
@@ -431,12 +442,12 @@ async def check_scheduled_matches():
             f"**Matches scheduled in the next 24 hours**:\nMatch times should be automatically converted to your timezone\n\n{result}"
         )
     else:
-        logging.info("No upcoming matches without caster")
+        logger.info("No upcoming matches without caster")
 
 
 @tasks.loop(minutes=10)
 async def update_stream_schedule():
-    logging.info("Updating stream schedule...")
+    logger.info("Updating stream schedule...")
 
     # get last message id
     channel = bot.get_channel(879207644399816704)
@@ -452,7 +463,7 @@ async def update_stream_schedule():
 
     upcoming_matches = matchups.get_weekly_matches()
     if len(upcoming_matches) > 0:
-        logging.info("Listing matches upcoming in the next 4 days")
+        logger.info("Listing matches upcoming in the next 4 days")
         result = ""
         for match in upcoming_matches:
             match_date = int(match.datetime.timestamp())
@@ -502,7 +513,7 @@ async def getserverid(ctx):
 async def on_ready():
     global guild
     guild = bot.get_guild(int(config.FOM_GUILD_ID))
-    logging.info(f"We have logged in as {bot.user}")
+    logger.info(f"We have logged in as {bot.user}")
     check_scheduled_matches.start()
     update_stream_schedule.start()
 

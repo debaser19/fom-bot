@@ -1,5 +1,5 @@
 import challonge
-import logging
+from main import logger
 
 import config
 
@@ -115,7 +115,7 @@ def fetch_players(tournament):
                 )
             )
         except Exception as err:
-            logging.warning(
+            logger.warning(
                 f"Missing info for player {player['name']} - adding blank values: {err}"
             )
             player_list.append(
