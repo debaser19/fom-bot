@@ -456,16 +456,16 @@ async def update_stream_schedule():
             match_date = int(match.datetime.timestamp())
             match_date = f"<t:{match_date}:f>"
             if match.datetime < datetime.now():
-                result += f"~~[GROUP {match.group}] **{match.p1_name} [{match.p1_race}]** vs **{match.p2_name} [{match.p2_race}]** - {match_date}~~"
+                result += f"~~[{match.group}] **{match.p1_name} [{match.p1_race}]** vs **{match.p2_name} [{match.p2_race}]** - {match_date}~~"
             else:
                 result += f"[GROUP {match.group}] **{match.p1_name} [{match.p1_race}]** vs **{match.p2_name} [{match.p2_race}]** - {match_date}"
 
             if match.stream != "":
                 result += f" - <https://twitch.tv/{match.stream}>\n"
             else:
-                result += f" - No caster scheduled yet - claim match with `!claim {match.id} <twitch_name>`\n"
+                result += f" - Claim match with `!claim {match.id} <twitch_name>`\n"
 
-        result += f"\n\n *Last updated: {last_update_time_string}*"
+        result += f"\n *Updated: {last_update_time_string}*"
 
     await message.edit(content=result)
 
