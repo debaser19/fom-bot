@@ -15,9 +15,9 @@ intents.members = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
+logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 logging.basicConfig(
     filename="bot.log",
-    stream=sys.stdout,
     format="%(asctime)s %(message)s",
     datefmt="[%m/%d/%Y %I:%M:%S %p]",
     level=logging.INFO,
@@ -412,7 +412,7 @@ async def check_scheduled_matches():
 
     upcoming_matches = matchups.get_upcoming_matches()
     if len(upcoming_matches) > 0:
-        logging.info("Listing matches upcoming in the next 24 hours")
+        logging.info("Checking for matches scheduled in the next 24 hours")
         result = ""
         for match in upcoming_matches:
             # convert match["datetime"] to string containing date and time
@@ -452,7 +452,7 @@ async def update_stream_schedule():
 
     upcoming_matches = matchups.get_weekly_matches()
     if len(upcoming_matches) > 0:
-        logging.info("Listing matches upcoming in the next 24 hours")
+        logging.info("Listing matches upcoming in the next 4 days")
         result = ""
         for match in upcoming_matches:
             match_date = int(match.datetime.timestamp())
