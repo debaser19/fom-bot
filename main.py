@@ -371,6 +371,7 @@ async def upcoming(ctx: commands.Context):
 
 @bot.command(name="claim")
 async def claim(ctx: commands.Context, match_id, twitch_name):
+    logger.info(f"{ctx.author} is trying to claim match id {match_id}")
     import matchups
 
     matchups_list = matchups.get_uncasted_matches()
@@ -388,9 +389,11 @@ async def claim(ctx: commands.Context, match_id, twitch_name):
                 match.stream = twitch_name
                 # update stream column in google sheet with twitch name
                 sheet.update_cell(game_id_row, 10, twitch_name)
+                logger.info(f"{twitch_name} claimed match {match.id}")
                 await ctx.reply(f"Match {match_id} claimed by {twitch_name}")
                 return
             except Exception as e:
+                logger.error(f"Error claiming match {match_id} - {e}")
                 await ctx.reply(f"Error claiming match: {e}")
                 return
 
