@@ -397,7 +397,7 @@ async def claim(ctx: commands.Context, match_id, twitch_name):
 @tasks.loop(hours=12)
 async def check_scheduled_matches():
     channel = bot.get_channel(881917059905253386)  # gym-newbie-league
-    caster_role = "<@&989262891641352333>"
+    caster_role = "<@&1008731553116995635>"
     import matchups
 
     upcoming_matches = matchups.get_upcoming_matches()
@@ -415,7 +415,7 @@ async def check_scheduled_matches():
             if match.stream != "":
                 result += f" - <https://twitch.tv/{match.stream}>\n"
             else:
-                result += f" - No {caster_role} scheduled yet\ - claim match with `!claim {match.id} <twitch_name>`\n"
+                result += f" - No {caster_role} scheduled yet - claim match with `!claim {match.id} <twitch_name>`\n"
 
         await channel.send(
             f"**Matches scheduled in the next 24 hours**:\nMatch times should be automatically converted to your timezone\n\n{result}"
