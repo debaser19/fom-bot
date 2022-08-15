@@ -20,7 +20,7 @@ def get_upcoming_matches():
     gc = gspread.service_account(filename=config.SERVICE_ACCOUNT_FILE)
     sh = gc.open_by_url(config.MATCHUPS_SHEET)
     sheet = sh.worksheet("s4")
-    logging.info(f"Grabbing all matchups")
+    logging.info("Grabbing all matchups")
     records = sheet.get_all_records()
     matchups_list = []
     from datetime import datetime, timedelta
@@ -124,6 +124,7 @@ def get_weekly_matches():
     logging.info("List of upcoming matches in the next 24 hours:")
     for matchup in new_matchups_list:
         logging.info(
+            "%s %s %s %s %s %s %s %s",
             matchup.id,
             matchup.datetime,
             matchup.p1_name,
@@ -140,7 +141,7 @@ def get_uncasted_matches():
     gc = gspread.service_account(filename=config.SERVICE_ACCOUNT_FILE)
     sh = gc.open_by_url(config.MATCHUPS_SHEET)
     sheet = sh.worksheet("s4")
-    logging.info(f"Grabbing all matchups")
+    logging.info("Grabbing all matchups")
     records = sheet.get_all_records()
     matchups_list = []
     from datetime import datetime, timedelta
@@ -184,6 +185,7 @@ def get_uncasted_matches():
     logging.info("List of upcoming matches in the next 24 hours:")
     for matchup in new_matchups_list:
         logging.info(
+            "%s %s %s %s %s %s %s %s",
             matchup.id,
             matchup.datetime,
             matchup.p1_name,
