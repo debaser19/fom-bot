@@ -168,7 +168,7 @@ def get_uncasted_matches():
             and matchup.stream == ""
             and matchup.datetime > datetime.now()
         ):
-            ().info(f"Adding matchup: {matchup}")
+            logger.info(f"Adding matchup: {matchup}")
             new_matchups_list.append(matchup)
 
     # sort list based on datetime value
