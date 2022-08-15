@@ -398,7 +398,7 @@ async def claim(ctx: commands.Context, match_id, twitch_name):
 @tasks.loop(hours=12)
 async def check_scheduled_matches():
     channel = bot.get_channel(881917059905253386)  # gym-newbie-league
-    caster_role = "<@&932411631143637022>"
+    caster_role = "<@&931627673225138177>"
     import matchups
 
     upcoming_matches = matchups.get_upcoming_matches()
