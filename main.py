@@ -3,6 +3,7 @@ import discord
 import gspread
 from table2ascii import table2ascii as t2a, PresetStyle
 import challonge
+import logging
 
 import string_commands
 import config
@@ -12,6 +13,13 @@ intents = discord.Intents.default()
 intents.members = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
+
+logging.basicConfig(
+    filename="bot.log",
+    format="%(asctime)s %(message)s",
+    datefmt="[%m/%d/%Y %I:%M:%S %p]",
+    level=logging.INFO,
+)
 
 
 def get_fom_sheet():
@@ -97,6 +105,7 @@ def get_players_list():
 
 @bot.command(name="stats")
 async def stats(ctx: commands.Context, user):
+    logging.info(f"Discord user {ctx.author} requested stats for {user}")
     channel_stats_check = 975799340733984838
     channel_bot_test = 963256852613832734
     if ctx.channel.name == ("stats-check") or ctx.channel.id == channel_bot_test:
@@ -109,7 +118,6 @@ async def stats(ctx: commands.Context, user):
                 player.discord_name.lower(),
             ]
             for alias in player.aliases:
-                print(alias)
                 player_tags.append(alias.lower())
             if user.lower() in player_tags:
                 content_string = f"**Name**: {player.name}\n**W3C**: {player.w3c_tag}\n**Discord**: {player.discord_name}\n**Rank**: {player.rank}\n**Race**: {player.race}\n**Wins**: {player.wins}\n**Losses**: {player.losses}\n**Win%**: {player.win_pct}\n**Seasons Played**: {player.seasons}\n**S1 MP**: {player.s1_mp}\n**S2 MP**: {player.s2_mp}\n**S3 MP**: {player.s3_mp}\n**Total MP**: {player.total_mp}"
@@ -341,7 +349,7 @@ async def upcoming(ctx: commands.Context):
 
     upcoming_matches = matchups.get_upcoming_matches()
     if len(upcoming_matches) > 0:
-        print("Listing matches upcoming in the next 24 hours")
+        logging.info("Listing matches upcoming in the next 24 hours")
         result = ""
         for match in upcoming_matches:
             # convert match["datetime"] to string containing date and time
@@ -365,7 +373,7 @@ async def upcoming(ctx: commands.Context):
     else:
         await message.delete()
         await ctx.reply("No matches scheduled in the next 24 hours")
-        print("No upcoming matches without caster")
+        logging.info("No upcoming matches without caster")
 
 
 @bot.command(name="claim")
@@ -402,7 +410,7 @@ async def check_scheduled_matches():
 
     upcoming_matches = matchups.get_upcoming_matches()
     if len(upcoming_matches) > 0:
-        print("Listing matches upcoming in the next 24 hours")
+        logging.info("Listing matches upcoming in the next 24 hours")
         result = ""
         for match in upcoming_matches:
             # convert match["datetime"] to string containing date and time
@@ -421,12 +429,12 @@ async def check_scheduled_matches():
             f"**Matches scheduled in the next 24 hours**:\nMatch times should be automatically converted to your timezone\n\n{result}"
         )
     else:
-        print("No upcoming matches without caster")
+        logging.info("No upcoming matches without caster")
 
 
 @tasks.loop(minutes=10)
 async def update_stream_schedule():
-    print("Updating stream schedule...")
+    logging.info("Updating stream schedule...")
 
     # get last message id
     channel = bot.get_channel(879207644399816704)
@@ -442,7 +450,7 @@ async def update_stream_schedule():
 
     upcoming_matches = matchups.get_weekly_matches()
     if len(upcoming_matches) > 0:
-        print("Listing matches upcoming in the next 24 hours")
+        logging.info("Listing matches upcoming in the next 24 hours")
         result = ""
         for match in upcoming_matches:
             match_date = int(match.datetime.timestamp())
@@ -492,7 +500,7 @@ async def getserverid(ctx):
 async def on_ready():
     global guild
     guild = bot.get_guild(int(config.FOM_GUILD_ID))
-    print(f"We have logged in as {bot.user}")
+    logging.info(f"We have logged in as {bot.user}")
     check_scheduled_matches.start()
     update_stream_schedule.start()
 

@@ -1,4 +1,5 @@
 import gspread
+import logging
 
 import config
 
@@ -19,7 +20,7 @@ def get_upcoming_matches():
     gc = gspread.service_account(filename=config.SERVICE_ACCOUNT_FILE)
     sh = gc.open_by_url(config.MATCHUPS_SHEET)
     sheet = sh.worksheet("s4")
-    print(f"Grabbing all matchups")
+    logging.info(f"Grabbing all matchups")
     records = sheet.get_all_records()
     matchups_list = []
     from datetime import datetime, timedelta
@@ -55,15 +56,14 @@ def get_upcoming_matches():
             and matchup.datetime > datetime.now()
             and matchup.datetime < datetime.now() + timedelta(hours=24)
         ):
-            # print(f"Removing matchup: {matchup}")
-            print(f"Adding matchup: {matchup}")
+            logging.info(f"Adding matchup: {matchup}")
             new_matchups_list.append(matchup)
 
     # sort list based on datetime value
     new_matchups_list.sort(key=lambda x: x.datetime)
-    print("List of upcoming matches in the next 24 hours:")
+    logging.info("List of upcoming matches in the next 24 hours:")
     for matchup in new_matchups_list:
-        print(
+        logging.info(
             matchup.id,
             matchup.datetime,
             matchup.p1_name,
@@ -80,7 +80,7 @@ def get_weekly_matches():
     gc = gspread.service_account(filename=config.SERVICE_ACCOUNT_FILE)
     sh = gc.open_by_url(config.MATCHUPS_SHEET)
     sheet = sh.worksheet("s4")
-    print(f"Grabbing all matchups")
+    logging.info(f"Grabbing all matchups")
     records = sheet.get_all_records()
     matchups_list = []
     from datetime import datetime, timedelta
@@ -116,15 +116,14 @@ def get_weekly_matches():
             and matchup.datetime > datetime.now() - timedelta(days=1)
             and matchup.datetime < datetime.now() + timedelta(days=7)
         ):
-            # print(f"Removing matchup: {matchup}")
-            print(f"Adding matchup: {matchup}")
+            logging.info(f"Adding matchup: {matchup}")
             new_matchups_list.append(matchup)
 
     # sort list based on datetime value
     new_matchups_list.sort(key=lambda x: x.datetime)
-    print("List of upcoming matches in the next 24 hours:")
+    logging.info("List of upcoming matches in the next 24 hours:")
     for matchup in new_matchups_list:
-        print(
+        logging.info(
             matchup.id,
             matchup.datetime,
             matchup.p1_name,
@@ -141,7 +140,7 @@ def get_uncasted_matches():
     gc = gspread.service_account(filename=config.SERVICE_ACCOUNT_FILE)
     sh = gc.open_by_url(config.MATCHUPS_SHEET)
     sheet = sh.worksheet("s4")
-    print(f"Grabbing all matchups")
+    logging.info(f"Grabbing all matchups")
     records = sheet.get_all_records()
     matchups_list = []
     from datetime import datetime, timedelta
@@ -177,15 +176,14 @@ def get_uncasted_matches():
             and matchup.stream == ""
             and matchup.datetime > datetime.now()
         ):
-            # print(f"Removing matchup: {matchup}")
-            print(f"Adding matchup: {matchup}")
+            logging.info(f"Adding matchup: {matchup}")
             new_matchups_list.append(matchup)
 
     # sort list based on datetime value
     new_matchups_list.sort(key=lambda x: x.datetime)
-    print("List of upcoming matches in the next 24 hours:")
+    logging.info("List of upcoming matches in the next 24 hours:")
     for matchup in new_matchups_list:
-        print(
+        logging.info(
             matchup.id,
             matchup.datetime,
             matchup.p1_name,

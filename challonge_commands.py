@@ -1,4 +1,5 @@
 import challonge
+import logging
 
 import config
 
@@ -114,7 +115,7 @@ def fetch_players(tournament):
                 )
             )
         except Exception as err:
-            print(
+            logging.warning(
                 f"Missing info for player {player['name']} - adding blank values: {err}"
             )
             player_list.append(
@@ -146,9 +147,7 @@ def fetch_matches(tournament):
             p1_race
         ) = p1_region = p2_discord_tag = p2_name = p2_race = p2_region = "blank"
         for player in players:
-            # print(f"{match['player1_id']} - {player.id}")
             if match["player1_id"] == player.id:
-                # print(f"{match['player1_id']} matches {player.id}")
                 p1_id = player.id
                 p1_name = player.name
                 p1_group = player.group
@@ -184,26 +183,3 @@ def fetch_matches(tournament):
         )
 
     return matches_list
-
-
-# def main():
-#     challonge.set_credentials("debaser19", config.CHALLONGE_KEY)
-#     tournament = challonge.tournaments.show(config.FOML_S4_ID)
-
-#     # players = fetch_players(tournament)
-#     # for player in players:
-#     #     if 'hippo'.lower() in player.name.lower():
-#     #         print(player.name, player.group, player.seed)
-# #     print(tournament["id"])
-# #     print(tournament["name"])
-# #     print(tournament["started_at"])
-
-# #     players = challonge.participants.index(tournament["id"])
-# #     for player in players:
-# #         print(player)
-#     matches = fetch_matches(tournament)
-
-#     for match in matches:
-#         print(f"[{match.id}] Round {match.round} [{match.group}] - {match.p1_name} / {match.p1_discord} [{match.p1_race}] VS {match.p2_name} / {match.p2_discord} [{match.p2_race}] - [{match.state}] [{match.score}]")
-
-# main()
