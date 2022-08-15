@@ -63,6 +63,10 @@ def get_upcoming_matches():
     new_matchups_list.sort(key=lambda x: x.datetime)
     logging.info("List of upcoming matches in the next 24 hours:")
     for matchup in new_matchups_list:
+        if matchup.stream == "":
+            stream_string = "No caster"
+        else:
+            stream_string = matchup.stream
         logging.info(
             matchup.id,
             matchup.datetime,
@@ -71,7 +75,7 @@ def get_upcoming_matches():
             matchup.p2_name,
             matchup.p2_race,
             matchup.group,
-            matchup.stream,
+            stream_string,
         )
     return new_matchups_list
 
@@ -123,15 +127,19 @@ def get_weekly_matches():
     new_matchups_list.sort(key=lambda x: x.datetime)
     logging.info("List of upcoming matches in the next 24 hours:")
     for matchup in new_matchups_list:
+        if matchup.stream == "":
+            stream_string = "No caster"
+        else:
+            stream_string = matchup.stream
         logging.info(
             matchup.id,
-            str(matchup.datetime),
+            matchup.datetime,
             matchup.p1_name,
             matchup.p1_race,
             matchup.p2_name,
             matchup.p2_race,
             matchup.group,
-            matchup.stream,
+            stream_string,
         )
     return new_matchups_list
 
@@ -183,14 +191,18 @@ def get_uncasted_matches():
     new_matchups_list.sort(key=lambda x: x.datetime)
     logging.info("List of upcoming matches in the next 24 hours:")
     for matchup in new_matchups_list:
+        if matchup.stream == "":
+            stream_string = "No caster"
+        else:
+            stream_string = matchup.stream
         logging.info(
             matchup.id,
-            str(matchup.datetime),
+            matchup.datetime,
             matchup.p1_name,
             matchup.p1_race,
             matchup.p2_name,
             matchup.p2_race,
             matchup.group,
-            matchup.stream,
+            stream_string,
         )
     return new_matchups_list
