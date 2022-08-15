@@ -105,7 +105,7 @@ def get_players_list():
 
 @bot.command(name="stats")
 async def stats(ctx: commands.Context, user):
-    logging.info(f"Discord user {ctx.author} requested stats for {user}")
+    logging.info("Discord user %s requested stats for %s", ctx.author, user)
     channel_stats_check = 975799340733984838
     channel_bot_test = 963256852613832734
     if ctx.channel.name == ("stats-check") or ctx.channel.id == channel_bot_test:
@@ -458,7 +458,7 @@ async def update_stream_schedule():
             if match.datetime < datetime.now():
                 result += f"~~[{match.group}] **{match.p1_name} [{match.p1_race}]** vs **{match.p2_name} [{match.p2_race}]** - {match_date}~~"
             else:
-                result += f"[GROUP {match.group}] **{match.p1_name} [{match.p1_race}]** vs **{match.p2_name} [{match.p2_race}]** - {match_date}"
+                result += f"[{match.group}] **{match.p1_name} [{match.p1_race}]** vs **{match.p2_name} [{match.p2_race}]** - {match_date}"
 
             if match.stream != "":
                 result += f" - <https://twitch.tv/{match.stream}>\n"
@@ -500,7 +500,7 @@ async def getserverid(ctx):
 async def on_ready():
     global guild
     guild = bot.get_guild(int(config.FOM_GUILD_ID))
-    logging.info(f"We have logged in as {bot.user}")
+    logging.info("We have logged in as %s", bot.user)
     check_scheduled_matches.start()
     update_stream_schedule.start()
 

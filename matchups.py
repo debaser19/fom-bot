@@ -56,7 +56,7 @@ def get_upcoming_matches():
             and matchup.datetime > datetime.now()
             and matchup.datetime < datetime.now() + timedelta(hours=24)
         ):
-            logging.info(f"Adding matchup: {matchup}")
+            logging.info("Adding matchup: %s", matchup)
             new_matchups_list.append(matchup)
 
     # sort list based on datetime value
@@ -116,7 +116,7 @@ def get_weekly_matches():
             and matchup.datetime > datetime.now()
             and matchup.datetime < datetime.now() + timedelta(days=4)
         ):
-            logging.info(f"Adding matchup: {matchup}")
+            logging.info("Adding matchup: %s", matchup)
             new_matchups_list.append(matchup)
 
     # sort list based on datetime value
@@ -176,7 +176,7 @@ def get_uncasted_matches():
             and matchup.stream == ""
             and matchup.datetime > datetime.now()
         ):
-            logging.info(f"Adding matchup: {matchup}")
+            logging.info("Adding matchup: %s", matchup)
             new_matchups_list.append(matchup)
 
     # sort list based on datetime value
