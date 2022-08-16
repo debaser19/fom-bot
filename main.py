@@ -4,6 +4,8 @@ import gspread
 from table2ascii import table2ascii as t2a, PresetStyle
 import challonge
 from fom_logger import logger
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
 
 import string_commands
 import config
@@ -423,7 +425,6 @@ async def claim(ctx: commands.Context, match_id, twitch_name):
                 return
 
 
-@tasks.loop(hours=12)
 async def check_scheduled_matches():
     channel = bot.get_channel(881917059905253386)  # gym-newbie-league
     caster_role = "<@&931627673225138177>"
@@ -450,7 +451,6 @@ async def check_scheduled_matches():
         logger.info("No upcoming matches without caster")
 
 
-@tasks.loop(minutes=10)
 async def update_stream_schedule():
     logger.info("Updating stream schedule...")
 
@@ -518,8 +518,16 @@ async def on_ready():
     global guild
     guild = bot.get_guild(int(config.FOM_GUILD_ID))
     logger.info(f"We have logged in as {bot.user}")
-    check_scheduled_matches.start()
-    update_stream_schedule.start()
+
+    # initialize the scheduler
+    scheduler = AsyncIOScheduler()
+
+    # add scheduled matches job to scheduler
+    scheduler.add_job(check_scheduled_matches, CronTrigger(hour="0,6,12,18"))
+    # add update stream schedule job to scheduler to run at every 10th minute
+    scheduler.add_job(update_stream_schedule, CronTrigger(minute="*/10"))
+
+    scheduler.start()
 
 
 DISCORD_TOKEN = config.DISCORD_TOKEN
