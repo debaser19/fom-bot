@@ -327,14 +327,34 @@ async def incomplete(ctx: commands.Context, group, round, second_round=None):
 # Veto commands
 # TODO: Add a way to start veto process between two players
 @bot.command(name="startveto")
-async def startveto(ctx: commands.Context, player_a, player_b):
-    map_pool = ["AL", "CH", "EI", "LR", "NI", "SG", "TH", "ST", "RC"]
+async def startveto(
+    ctx: commands.Context, player1: discord.User, player2: discord.User
+):
+    logger.info(f"{ctx.author} started a veto between {player1} and {player2}")
 
-    async def veto_process(m):
-        await ctx.reply(
-            f"Starting map veto process between {player_a} and {player_b}\nVeto order: A B A B B A"
-        )
-        await ctx.reply(f"{player_a} pick a map to veto")
+    # make sure both players are valid users on the server
+    if not ctx.guild.get_member(int(player1.id)):
+        logger.warning(f"{player1} is not a valid user on this server")
+        await ctx.reply(f"{player1} is not a valid user on this server.")
+        return
+    if not ctx.guild.get_member(int(player2.id)):
+        logger.warning(f"{player2} is not a valid user on this server")
+        await ctx.reply(f"{player2} is not a valid user on this server.")
+        return
+
+    # ask who will be player A
+    player_a_message = await ctx.reply(
+        f"Which player will be player A?\n:regional_indicator_a: - {player1}\n:regional_indicator_b: - {player2}"
+    )
+    await player_a_message.add_reaction("🇦")
+    await player_a_message.add_reaction("🇧")
+
+    # wait for reaction from player_a or player_b
+    def check(reaction, user):
+        return user == player1 or user == player2
+
+    reaction = await bot.wait_for("reaction_add", check=check)
+    await ctx.send(f"{reaction[0]} was selected")
 
 
 @bot.command(name="upcoming")
@@ -468,8 +488,14 @@ async def update_stream_schedule():
 
     upcoming_matches = matchups.get_weekly_matches()
     if len(upcoming_matches) > 0:
+        count = 0
         result = ""
         for match in upcoming_matches:
+            # check if day of current match is different from previous match
+            if match.datetime.strftime("%a %B %d") != upcoming_matches[
+                count - 1
+            ].datetime.strftime("%a %B %d"):
+                result += f"\n**{match.datetime.strftime('%a %B %d')}**\n"
             match_date = int(match.datetime.timestamp())
             match_date = f"<t:{match_date}:f>"
             if match.datetime < datetime.now():
@@ -480,11 +506,20 @@ async def update_stream_schedule():
             if match.stream != "":
                 result += f" - <https://twitch.tv/{match.stream}>\n"
             else:
-                result += f" - Claim match with `!claim {match.id} <twitch_name>`\n"
+                result += f" - `!claim {match.id} <twitch_name>`\n"
 
+            count += 1
+
+        result += "\n**For full schedule check out <https://warcraft-gym.com/>**"
         result += f"\n *Updated: {last_update_time_string}*"
 
-    await message.edit(content=result)
+    # convert result to discord embed
+    embed = discord.Embed(
+        title="FoM League Season 4 Stream Schedule", description=result, color=0x00FF00
+    )
+    # edit message with new embed
+    await message.edit(embed=embed)
+    # await message.edit(content=result)
 
 
 @bot.command(name="hotdog")
@@ -524,8 +559,8 @@ async def on_ready():
 
     # add scheduled matches job to scheduler
     scheduler.add_job(check_scheduled_matches, CronTrigger(hour="0,6,12,18"))
-    # add update stream schedule job to scheduler to run at every 10th minute
-    scheduler.add_job(update_stream_schedule, CronTrigger(minute="*/10"))
+    # add update stream schedule job to scheduler to run at every 5th minute
+    scheduler.add_job(update_stream_schedule, CronTrigger(minute="*/5"))
 
     scheduler.start()
 
