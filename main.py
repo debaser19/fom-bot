@@ -424,7 +424,7 @@ async def claim(ctx: commands.Context, match_id, twitch_name):
                         f"Match {match_id} is already claimed by {match.stream}"
                     )
                     await ctx.reply(
-                        f"Match {match.id} already claiemed by {match.stream}"
+                        f"Match {match.id} already claimed by {match.stream}"
                     )
                     return
             try:
