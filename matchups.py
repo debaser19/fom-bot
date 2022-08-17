@@ -111,19 +111,20 @@ def get_weekly_matches():
             logger.warn(f"Date was not able to be parsed, likely empty: {e}")
 
     new_matchups_list = []
+    days_num = 4
     for matchup in matchups_list:
         # remove matchups that have no date, are in the past, or more than one hour away
         if (
             matchup.datetime is not None
             and matchup.datetime > datetime.now() - timedelta(hours=1)
-            and matchup.datetime < datetime.now() + timedelta(days=4)
+            and matchup.datetime < datetime.now() + timedelta(days=days_num)
         ):
             logger.info(f"Adding matchup: {matchup}")
             new_matchups_list.append(matchup)
 
     # sort list based on datetime value
     new_matchups_list.sort(key=lambda x: x.datetime)
-    logger.info("List of upcoming matches in the next 24 hours:")
+    logger.info(f"List of upcoming matches in the next {days_num} days:")
     for matchup in new_matchups_list:
         if matchup.stream == "":
             stream_string = "No caster"
