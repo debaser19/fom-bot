@@ -485,7 +485,7 @@ async def check_scheduled_matches():
             if match.stream != "":
                 result += f" - <https://twitch.tv/{match.stream}>\n"
             else:
-                result += f" - `[{match.id}]`\n"
+                result += f" - `[{match.id}] - {caster_role}`\n"
 
             count += 1
 
