@@ -437,7 +437,9 @@ async def claim(ctx: commands.Context, match_id, twitch_name):
                 # update stream column in google sheet with twitch name
                 sheet.update_cell(game_id_row, 10, twitch_name)
                 logger.info(f"{twitch_name} claimed match {match.id}")
-                await ctx.reply(f"Match {match_id} claimed by {twitch_name}")
+                await ctx.reply(
+                    f"Group [{match.group}] match {match_id} **[{match.p1_name} ({match.p1_race}) vs {match.p2_name} ({match.p2_race})]** claimed by **{twitch_name}**"
+                )
                 return
             except Exception as e:
                 logger.error(f"Error claiming match {match_id} - {e}")
