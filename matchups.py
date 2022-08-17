@@ -146,22 +146,25 @@ def get_uncasted_matches():
         match_time = record.get("START TIME (EDT)")
         match_time = match_time.strip()
 
-        # convert match_date and match_time to datetime object
-        match_datetime = datetime.strptime(
-            f"{match_date} {match_time}", "%m/%d/%Y %I:%M %p"
-        )
-        matchups_list.append(
-            Matchup(
-                record.get("id"),
-                match_datetime,
-                record.get("PLAYER 1"),
-                record.get("RACE 1"),
-                record.get("PLAYER 2"),
-                record.get("RACE 2"),
-                record.get("GROUP"),
-                record.get("STREAM"),
+        try:
+            # convert match_date and match_time to datetime object
+            match_datetime = datetime.strptime(
+                f"{match_date} {match_time}", "%m/%d/%Y %I:%M %p"
             )
-        )
+            matchups_list.append(
+                Matchup(
+                    record.get("id"),
+                    match_datetime,
+                    record.get("PLAYER 1"),
+                    record.get("RACE 1"),
+                    record.get("PLAYER 2"),
+                    record.get("RACE 2"),
+                    record.get("GROUP"),
+                    record.get("STREAM"),
+                )
+            )
+        except ValueError as e:
+            logger.warn(f"Date was not able to be parsed, likely empty: {e}")
 
     new_matchups_list = []
     for matchup in matchups_list:
@@ -202,22 +205,25 @@ def get_all_matches():
         match_time = record.get("START TIME (EDT)")
         match_time = match_time.strip()
 
-        # convert match_date and match_time to datetime object
-        match_datetime = datetime.strptime(
-            f"{match_date} {match_time}", "%m/%d/%Y %I:%M %p"
-        )
-        matchups_list.append(
-            Matchup(
-                record.get("id"),
-                match_datetime,
-                record.get("PLAYER 1"),
-                record.get("RACE 1"),
-                record.get("PLAYER 2"),
-                record.get("RACE 2"),
-                record.get("GROUP"),
-                record.get("STREAM"),
+        try:
+            # convert match_date and match_time to datetime object
+            match_datetime = datetime.strptime(
+                f"{match_date} {match_time}", "%m/%d/%Y %I:%M %p"
             )
-        )
+            matchups_list.append(
+                Matchup(
+                    record.get("id"),
+                    match_datetime,
+                    record.get("PLAYER 1"),
+                    record.get("RACE 1"),
+                    record.get("PLAYER 2"),
+                    record.get("RACE 2"),
+                    record.get("GROUP"),
+                    record.get("STREAM"),
+                )
+            )
+        except ValueError as e:
+            logger.warn(f"Date was not able to be parsed, likely empty: {e}")
 
     new_matchups_list = []
     for matchup in matchups_list:
