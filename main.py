@@ -492,10 +492,10 @@ async def update_stream_schedule():
         result = ""
         for match in upcoming_matches:
             # check if day of current match is different from previous match
-            if match.datetime.strftime("%a %B %d") != upcoming_matches[
+            if match.datetime.strftime("%a %b %d") != upcoming_matches[
                 count - 1
-            ].datetime.strftime("%a %B %d"):
-                result += f"\n**{match.datetime.strftime('%a %B %d')}**\n"
+            ].datetime.strftime("%a %b %d"):
+                result += f"\n**{match.datetime.strftime('%a %b %d')}**\n"
             match_date = int(match.datetime.timestamp())
             match_date = f"<t:{match_date}:f>"
             if match.datetime < datetime.now():
@@ -506,10 +506,11 @@ async def update_stream_schedule():
             if match.stream != "":
                 result += f" - <https://twitch.tv/{match.stream}>\n"
             else:
-                result += f" - `!claim {match.id} <twitch_name>`\n"
+                result += f" - `[{match.id}]`\n"
 
             count += 1
 
+        result += "\n**Claim matches with `!claim <match_id> <twitch_name>`**"
         result += "\n**For full schedule check out <https://warcraft-gym.com/>**"
         result += f"\n *Updated: {last_update_time_string}*"
 
