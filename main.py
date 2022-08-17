@@ -519,7 +519,11 @@ async def update_stream_schedule():
         title="FoM League Season 4 Stream Schedule", description=result, color=0x00FF00
     )
     # edit message with new embed
-    await message.edit(embed=embed)
+    try:
+        logger.info(f"Editing stream schedule message... Characters: {len(result)}")
+        await message.edit(embed=embed)
+    except discord.errors.HTTPException as e:
+        logger.error(f"Error updating stream schedule - {e}")
     # await message.edit(content=result)
 
 
