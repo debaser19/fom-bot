@@ -113,7 +113,7 @@ def get_weekly_matches():
         if (
             matchup.datetime is not None
             and matchup.datetime > datetime.now() - timedelta(hours=1)
-            and matchup.datetime < datetime.now() + timedelta(days=5)
+            and matchup.datetime < datetime.now() + timedelta(days=4)
         ):
             logger.info(f"Adding matchup: {matchup}")
             new_matchups_list.append(matchup)
