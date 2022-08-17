@@ -362,33 +362,45 @@ async def upcoming(ctx: commands.Context):
     logger.info(f"{ctx.author} requested upcoming matches")
     message = await ctx.reply("Looking for upcoming matches...")
     import matchups
+    from datetime import datetime
 
     upcoming_matches = matchups.get_upcoming_matches()
     if len(upcoming_matches) > 0:
+        count = 0
         result = ""
         for match in upcoming_matches:
-            # convert match["datetime"] to string containing date and time
-            # match_date = match["datetime"].strftime("%a %d %b @ %I:%M %p EST")
-            # convert match["datetime"] to unix timestamp
+            # check if day of current match is different from previous match
+            if match.datetime.strftime("%a %b %d") != upcoming_matches[
+                count - 1
+            ].datetime.strftime("%a %b %d"):
+                result += f"\n**{match.datetime.strftime('%a %b %d')}**\n"
             match_date = int(match.datetime.timestamp())
             match_date = f"<t:{match_date}:f>"
-            result += f"[ID: {match.id}] [GROUP: {match.group}] **{match.p1_name} [{match.p1_race}]** vs **{match.p2_name} [{match.p2_race}]** - {match_date}"
+            if match.datetime < datetime.now():
+                result += f"_[{match.group}] **{match.p1_name} [{match.p1_race}]** vs **{match.p2_name} [{match.p2_race}]** - {match_date}_"
+            else:
+                result += f"[{match.group}] **{match.p1_name} [{match.p1_race}]** vs **{match.p2_name} [{match.p2_race}]** - {match_date}"
 
             if match.stream != "":
                 result += f" - <https://twitch.tv/{match.stream}>\n"
             else:
-                result += (
-                    f" - No caster scheduled yet - `!claim {match.id} <twitch_name>`\n"
-                )
+                result += f" - `[{match.id}]`\n"
 
-        await message.delete()
-        await ctx.reply(
-            f"**Matches scheduled in the next 24 hours**:\nMatch times should be automatically converted to your timezone\n\n{result}"
-        )
-    else:
-        await message.delete()
-        await ctx.reply("No matches scheduled in the next 24 hours")
-        logger.info("No upcoming matches without caster")
+            count += 1
+
+        result += "\n**Claim matches with `!claim <match_id> <twitch_name>`**"
+        result += "\n**For full schedule check out <https://warcraft-gym.com/>**"
+
+    # convert result to discord embed
+    embed = discord.Embed(
+        title="FoM League Season 4 Stream Schedule", description=result, color=0x00FF00
+    )
+    # edit message with new embed
+    try:
+        logger.info(f"Editing stream schedule message... Characters: {len(result)}")
+        await message.edit(embed=embed)
+    except discord.errors.HTTPException as e:
+        logger.error(f"Error updating stream schedule - {e}")
 
 
 @bot.command(name="claim")
@@ -451,26 +463,64 @@ async def check_scheduled_matches():
     channel = bot.get_channel(881917059905253386)  # gym-newbie-league
     caster_role = "<@&931627673225138177>"
     import matchups
+    from datetime import datetime
 
     upcoming_matches = matchups.get_upcoming_matches()
     if len(upcoming_matches) > 0:
-        logger.info("Checking for matches scheduled in the next 24 hours")
+        count = 0
         result = ""
         for match in upcoming_matches:
+            # check if day of current match is different from previous match
+            if match.datetime.strftime("%a %b %d") != upcoming_matches[
+                count - 1
+            ].datetime.strftime("%a %b %d"):
+                result += f"\n**{match.datetime.strftime('%a %b %d')}**\n"
             match_date = int(match.datetime.timestamp())
             match_date = f"<t:{match_date}:f>"
-            result += f"[ID: {match.id}] [GROUP: {match.group}] **{match.p1_name} [{match.p1_race}]** vs **{match.p2_name} [{match.p2_race}]** - {match_date}"
+            if match.datetime < datetime.now():
+                result += f"_[{match.group}] **{match.p1_name} [{match.p1_race}]** vs **{match.p2_name} [{match.p2_race}]** - {match_date}_"
+            else:
+                result += f"[{match.group}] **{match.p1_name} [{match.p1_race}]** vs **{match.p2_name} [{match.p2_race}]** - {match_date}"
 
             if match.stream != "":
                 result += f" - <https://twitch.tv/{match.stream}>\n"
             else:
-                result += f" - No {caster_role} scheduled yet - claim match with `!claim {match.id} <twitch_name>`\n"
+                result += f" - `[{match.id}]`\n"
 
-        await channel.send(
-            f"**Matches scheduled in the next 24 hours**:\nMatch times should be automatically converted to your timezone\n\n{result}"
-        )
-    else:
-        logger.info("No upcoming matches without caster")
+            count += 1
+
+        result += "\n**Claim matches with `!claim <match_id> <twitch_name>`**"
+        result += "\n**For full schedule check out <https://warcraft-gym.com/>**"
+
+    # convert result to discord embed
+    embed = discord.Embed(
+        title="FoM League Season 4 Stream Schedule",
+        description=result,
+        color=0x00FF00,
+    )
+    # edit message with new embed
+    try:
+        logger.info(f"Editing stream schedule message... Characters: {len(result)}")
+        await channel.send(embed=embed)
+    except discord.errors.HTTPException as e:
+        logger.error(f"Error updating stream schedule - {e}")
+    #     logger.info("Checking for matches scheduled in the next 24 hours")
+    #     result = ""
+    #     for match in upcoming_matches:
+    #         match_date = int(match.datetime.timestamp())
+    #         match_date = f"<t:{match_date}:f>"
+    #         result += f"[ID: {match.id}] [GROUP: {match.group}] **{match.p1_name} [{match.p1_race}]** vs **{match.p2_name} [{match.p2_race}]** - {match_date}"
+
+    #         if match.stream != "":
+    #             result += f" - <https://twitch.tv/{match.stream}>\n"
+    #         else:
+    #             result += f" - No {caster_role} scheduled yet - claim match with `!claim {match.id} <twitch_name>`\n"
+
+    #     await channel.send(
+    #         f"**Matches scheduled in the next 24 hours**:\nMatch times should be automatically converted to your timezone\n\n{result}"
+    #     )
+    # else:
+    #     logger.info("No upcoming matches without caster")
 
 
 async def update_stream_schedule():
@@ -526,7 +576,6 @@ async def update_stream_schedule():
         await message.edit(embed=embed)
     except discord.errors.HTTPException as e:
         logger.error(f"Error updating stream schedule - {e}")
-    # await message.edit(content=result)
 
 
 @bot.command(name="hotdog")
