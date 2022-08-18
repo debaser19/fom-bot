@@ -34,10 +34,12 @@ class Player:
         s1_champ,
         s2_champ,
         s3_champ,
+        s4_champ,
         aliases,
         s1_mp,
         s2_mp,
         s3_mp,
+        s4_mp,
         total_mp,
         rank,
         bnet_name,
@@ -53,10 +55,12 @@ class Player:
         self.s1_champ = s1_champ
         self.s2_champ = s2_champ
         self.s3_champ = s3_champ
+        self.s4_champ = s4_champ
         self.aliases = aliases
         self.s1_mp = s1_mp
         self.s2_mp = s2_mp
         self.s3_mp = s3_mp
+        self.s4_mp = s4_mp
         self.total_mp = total_mp
         self.rank = rank
         self.bnet_name = bnet_name
@@ -83,10 +87,12 @@ def get_players_list():
                 record.get("S1 CHAMP"),
                 record.get("S2 CHAMP"),
                 record.get("S3 CHAMP"),
+                record.get("S4 CHAMP"),
                 record.get("Aliases").split(","),
                 record.get("s1 MP"),
                 record.get("s2 MP"),
                 record.get("s3 MP"),
+                record.get("s4 MP"),
                 record.get("MP"),
                 record.get("Rank"),
                 record.get("BNet Name"),
@@ -115,7 +121,7 @@ async def stats(ctx: commands.Context, user):
             for alias in player.aliases:
                 player_tags.append(alias.lower())
             if user.lower() in player_tags:
-                content_string = f"**Name**: {player.name}\n**W3C**: {player.w3c_tag}\n**Discord**: {player.discord_name}\n**Rank**: {player.rank}\n**Race**: {player.race}\n**Wins**: {player.wins}\n**Losses**: {player.losses}\n**Win%**: {player.win_pct}\n**Seasons Played**: {player.seasons}\n**S1 MP**: {player.s1_mp}\n**S2 MP**: {player.s2_mp}\n**S3 MP**: {player.s3_mp}\n**Total MP**: {player.total_mp}"
+                content_string = f"**Name**: {player.name}\n**W3C**: {player.w3c_tag}\n**Discord**: {player.discord_name}\n**Rank**: {player.rank}\n**Race**: {player.race}\n**Wins**: {player.wins}\n**Losses**: {player.losses}\n**Win%**: {player.win_pct}\n**Seasons Played**: {player.seasons}\n**S1 MP**: {player.s1_mp}\n**S2 MP**: {player.s2_mp}\n**S3 MP**: {player.s3_mp}\n**S4 MP**: {player.s4_mp}\n**Total MP**: {player.total_mp}"
                 embed = discord.Embed(
                     title=f"{user} Stats", colour=0x0C2C55, description=content_string
                 )
@@ -139,6 +145,11 @@ async def stats(ctx: commands.Context, user):
                         "./images/fom_s3_champ.png", filename="fom_s3_champ.png"
                     )
                     embed.set_thumbnail(url="attachment://fom_s3_champ.png")
+                if player.s4_champ == "YES":
+                    champ_logo = discord.File(
+                        "./images/fom_s4_champ.png", filename="fom_s4_champ.png"
+                    )
+                    embed.set_thumbnail(url="attachment://fom_s4_champ.png")
 
                 await ctx.reply(embed=embed, file=champ_logo)
 
