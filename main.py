@@ -11,7 +11,7 @@ import string_commands
 import config
 import challonge_commands
 
-intents = discord.Intents.default()
+intents = discord.Intents.all()
 intents.members = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
@@ -466,7 +466,9 @@ async def check_scheduled_matches():
     from datetime import datetime
 
     upcoming_matches = matchups.get_upcoming_matches()
+    message_content = ""
     if len(upcoming_matches) > 0:
+        message_content = caster_role
         count = 0
         result = ""
         for match in upcoming_matches:
@@ -498,29 +500,13 @@ async def check_scheduled_matches():
         description=result,
         color=0x00FF00,
     )
+
     # edit message with new embed
     try:
         logger.info(f"Editing stream schedule message... Characters: {len(result)}")
-        await channel.send(embed=embed)
+        await channel.send(content=message_content, embed=embed)
     except discord.errors.HTTPException as e:
         logger.error(f"Error updating stream schedule - {e}")
-    #     logger.info("Checking for matches scheduled in the next 24 hours")
-    #     result = ""
-    #     for match in upcoming_matches:
-    #         match_date = int(match.datetime.timestamp())
-    #         match_date = f"<t:{match_date}:f>"
-    #         result += f"[ID: {match.id}] [GROUP: {match.group}] **{match.p1_name} [{match.p1_race}]** vs **{match.p2_name} [{match.p2_race}]** - {match_date}"
-
-    #         if match.stream != "":
-    #             result += f" - <https://twitch.tv/{match.stream}>\n"
-    #         else:
-    #             result += f" - No {caster_role} scheduled yet - claim match with `!claim {match.id} <twitch_name>`\n"
-
-    #     await channel.send(
-    #         f"**Matches scheduled in the next 24 hours**:\nMatch times should be automatically converted to your timezone\n\n{result}"
-    #     )
-    # else:
-    #     logger.info("No upcoming matches without caster")
 
 
 async def update_stream_schedule():
@@ -539,6 +525,7 @@ async def update_stream_schedule():
     last_update_time_string = f"<t:{last_update_time}:f>"
 
     upcoming_matches = matchups.get_weekly_matches()
+    embeds = []
     if len(upcoming_matches) > 0:
         count = 0
         result = ""
@@ -547,7 +534,29 @@ async def update_stream_schedule():
             if match.datetime.strftime("%a %b %d") != upcoming_matches[
                 count - 1
             ].datetime.strftime("%a %b %d"):
-                result += f"\n**{match.datetime.strftime('%a %b %d')}**\n"
+                logger.info(
+                    f"Adding embed for {upcoming_matches[count - 1].datetime.strftime('%a %b %d')}"
+                )
+
+                result += "\n**Claim matches with `!claim <match_id> <twitch_name>`**"
+                result += (
+                    "\n**For full schedule check out <https://warcraft-gym.com/>**"
+                )
+                result += f"\n *Updated: {last_update_time_string}*"
+
+                embed = discord.Embed(
+                    title=f"{match.datetime.strftime('%a %b %d')}",
+                    description=result,
+                    color=0x00FF00,
+                )
+                embed.description += (
+                    "\n Claim matches with `!claim <match_id> <twitch_name>`"
+                )
+                embed.description += (
+                    "\n**For full schedule check out <https://warcraft-gym.com/>**"
+                )
+                embeds.append(embed)
+                result = ""
             match_date = int(match.datetime.timestamp())
             match_date = f"<t:{match_date}:f>"
             if match.datetime < datetime.now():
@@ -560,20 +569,20 @@ async def update_stream_schedule():
             else:
                 result += f" - `[{match.id}]`\n"
 
+            embed.description = result
+            embed.description += (
+                "\n Claim matches with `!claim <match_id> <twitch_name>`"
+            )
+            embed.description += (
+                "\n**For full schedule check out <https://warcraft-gym.com/>**"
+            )
+
             count += 1
 
-        result += "\n**Claim matches with `!claim <match_id> <twitch_name>`**"
-        result += "\n**For full schedule check out <https://warcraft-gym.com/>**"
-        result += f"\n *Updated: {last_update_time_string}*"
-
-    # convert result to discord embed
-    embed = discord.Embed(
-        title="FoM League Season 4 Stream Schedule", description=result, color=0x00FF00
-    )
     # edit message with new embed
     try:
         logger.info(f"Editing stream schedule message... Characters: {len(result)}")
-        await message.edit(embed=embed)
+        await message.edit(embeds=embeds)
     except discord.errors.HTTPException as e:
         logger.error(f"Error updating stream schedule - {e}")
 

@@ -111,7 +111,7 @@ def get_weekly_matches():
             logger.warn(f"Date was not able to be parsed, likely empty: {e}")
 
     new_matchups_list = []
-    days_num = 4
+    days_num = 7
     for matchup in matchups_list:
         # remove matchups that have no date, are in the past, or more than one hour away
         if (
