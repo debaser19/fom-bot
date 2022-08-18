@@ -468,7 +468,6 @@ async def check_scheduled_matches():
     upcoming_matches = matchups.get_upcoming_matches()
     message_content = ""
     if len(upcoming_matches) > 0:
-        message_content = caster_role
         count = 0
         result = ""
         for match in upcoming_matches:
@@ -487,7 +486,8 @@ async def check_scheduled_matches():
             if match.stream != "":
                 result += f" - <https://twitch.tv/{match.stream}>\n"
             else:
-                result += f" - `[{match.id}] - {caster_role}`\n"
+                message_content = caster_role
+                result += f" - `[{match.id}]`\n"
 
             count += 1
 
