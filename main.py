@@ -538,12 +538,6 @@ async def update_stream_schedule():
                     f"Adding embed for {upcoming_matches[count - 1].datetime.strftime('%a %b %d')}"
                 )
 
-                result += "\n**Claim matches with `!claim <match_id> <twitch_name>`**"
-                result += (
-                    "\n**For full schedule check out <https://warcraft-gym.com/>**"
-                )
-                result += f"\n *Updated: {last_update_time_string}*"
-
                 embed = discord.Embed(
                     title=f"{match.datetime.strftime('%a %b %d')}",
                     description=result,
@@ -576,6 +570,7 @@ async def update_stream_schedule():
             embed.description += (
                 "\n**For full schedule check out <https://warcraft-gym.com/>**"
             )
+            embed.description += f"\n *Updated: {last_update_time_string}*"
 
             count += 1
 
