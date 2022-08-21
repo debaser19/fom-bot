@@ -459,6 +459,7 @@ async def claim(ctx: commands.Context, match_id, twitch_name):
                 match.stream = twitch_name
                 # update stream column in google sheet with twitch name
                 sheet.update_cell(game_id_row, 10, twitch_name)
+                sheet.update_cell(game_id_row, 13, str(ctx.author))
                 logger.info(f"{twitch_name} claimed match {match.id}")
                 await ctx.reply(
                     f"Group [{match.group}] match {match_id} **[{match.p1_name} ({match.p1_race}) vs {match.p2_name} ({match.p2_race})]** claimed by **{twitch_name}**"
@@ -470,8 +471,59 @@ async def claim(ctx: commands.Context, match_id, twitch_name):
                 return
 
 
+@bot.command(name="unclaim")
+async def unclaim(ctx: commands.Context, match_id):
+    logger.info(f"{ctx.author} is trying to unclaim match id {match_id}")
+    role = discord.utils.find(lambda r: r.name == "FoM League Admin", ctx.guild.roles)
+    if role in ctx.author.roles:
+        fom_admin = True
+        logger.info(f"{ctx.author} is an admin, user is able to unclaim any match")
+    else:
+        fom_admin = False
+        logger.info(
+            f"{ctx.author} is not an admin, user is not able to unclaim matches claimed by other casters"
+        )
+
+    import matchups
+
+    matchups_list = matchups.get_all_matches()
+    for match in matchups_list:
+        if int(match.id) == int(match_id):
+            if match.stream == "":
+                logger.warning(f"Match {match_id} is not claimed")
+                await ctx.reply(f"Match {match.id} is not claimed")
+                return
+            try:
+                # find game id in ID column of google sheet
+                gc = gspread.service_account(filename=config.SERVICE_ACCOUNT_FILE)
+                sh = gc.open_by_url(config.MATCHUPS_SHEET)
+                sheet = sh.worksheet("s4")
+                game_id_row = sheet.find(str(match.id)).row
+                current_claim = sheet.cell(game_id_row, 13).value
+                if fom_admin == True:
+                    if str(ctx.author) != current_claim:
+                        logger.warning(
+                            f"{ctx.author} is not the claimer of match {match_id}, cannot unclaim"
+                        )
+                        await ctx.reply(
+                            f"{ctx.author} is not the claimer of match {match.id}, cannot unclaim"
+                        )
+                        return
+                match.stream = ""
+                # update stream column in google sheet with twitch name
+                sheet.update_cell(game_id_row, 10, "")
+                sheet.update_cell(game_id_row, 13, "")
+                logger.info(f"{ctx.author} unclaimed match {match.id}")
+                await ctx.reply(
+                    f"Group [{match.group}] match {match_id} **[{match.p1_name} ({match.p1_race}) vs {match.p2_name} ({match.p2_race})]** unclaimed by {ctx.author}"
+                )
+            except Exception as e:
+                logger.error(f"Error unclaiming match {match_id} - {e}")
+                ctx.reply(f"Error unclaiming match: {e}")
+
+
 async def check_scheduled_matches():
-    channel = bot.get_channel(881917059905253386)  # gym-newbie-league
+    channel = bot.get_channel(881917059905253386)  # league-chat
     caster_role = "<@&931627673225138177>"
     import matchups
     from datetime import datetime
