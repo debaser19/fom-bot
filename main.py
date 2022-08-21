@@ -368,8 +368,7 @@ async def fomschedule(
                     (str(player1["member_name"]).lower() == str(match.p1_discord).lower() and str(player2["member_name"]).lower() == str(match.p2_discord).lower()) or
                     (str(player1["member_name"]).lower() == str(match.p2_discord).lower() and str(player2["member_name"]).lower() == str(match.p1_discord).lower())
                     )
-                )
-            ):
+                ):
                 reply_string+=f"Group [{match.group}] <@!{match.p1_discord_id}> [{match.p1_race}] VS <@!{match.p2_discord_id}> [{match.p2_race}] is scheduled at {stime} on {sdate}"
                 #add schedule to the spreadsheet:
                 
