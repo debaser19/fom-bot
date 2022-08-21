@@ -334,7 +334,52 @@ async def incomplete(ctx: commands.Context, group, round, second_round=None):
         f"{info_string}**GROUP {match.group.upper()} - ROUND {round}**\n{reply_string}"
     )
 
+# schedule a match between two players
+@bot.command(name="fomschedule")
+async def fomschedule(
+    ctx: commands.Context, player1: discord.User, player2: discord.User, sdate, stime
+):
+    if ctx.channel.name == ("scheduled-games") or ctx.channel.id == channel_bot_test:
+        logger.info(f"{ctx.author} scheduled a match between {player1} and {player2}")
 
+        # make sure both players are valid users on the server
+        if not ctx.guild.get_member(int(player1.id)):
+            logger.warning(f"{player1} is not a valid user on this server")
+            await ctx.reply(f"{player1} is not a valid user on this server.")
+            return
+        if not ctx.guild.get_member(int(player2.id)):
+            logger.warning(f"{player2} is not a valid user on this server")
+            await ctx.reply(f"{player2} is not a valid user on this server.")
+            return
+        #make sure the date and time formats are correct:
+        if not sdate.isnumeric() or not stime.isnumeric() or len(sdate)!=8 or len(stime)!=4:
+            await ctx.reply("date or time format is incorrect.  e.g. Aug 21, 2022 at 16:30 EDT should be 08212022 1630.")
+            return
+        
+        # make sure the two players have an incomplete match:
+        tournament = challonge.tournaments.show(config.FOML_S4_ID)
+        matches = challonge_commands.fetch_matches(tournament)
+        member_list = get_members(guild)
+        match_list = []
+        reply_string=''
+        for match in matches:
+            if (match.state != "complete" and
+                    (
+                    (str(player1["member_name"]).lower() == str(match.p1_discord).lower() and str(player2["member_name"]).lower() == str(match.p2_discord).lower()) or
+                    (str(player1["member_name"]).lower() == str(match.p2_discord).lower() and str(player2["member_name"]).lower() == str(match.p1_discord).lower())
+                    )
+                )
+            ):
+                reply_string+=f"Group [{match.group}] <@!{match.p1_discord_id}> [{match.p1_race}] VS <@!{match.p2_discord_id}> [{match.p2_race}] is scheduled at {stime} on {sdate}"
+                #add schedule to the spreadsheet:
+                
+        if reply_string=="":
+            await ctx.send("The two players do not have an incomplete match to schedule.  Please check spelling and only use @user as player identifiers.")
+        else:
+            await ctx.send(reply_string)
+    else:
+        await ctx.send("please use the #scheduled-games channel for this command.")
+        
 # Veto commands
 # TODO: Add a way to start veto process between two players
 @bot.command(name="startveto")
