@@ -365,10 +365,10 @@ async def fomschedule(
             await ctx.reply("scheduled time has to be after NOW.  check formats: e.g. Aug 21, 2022 at 16:30 EDT should be 08212022 1630")
             return
         else:
-            ldate = match_datetime.strftime('%m/%d/%Y')
-            ddate = match_datetime.strftime('%Y, %b %d, %Y')
-            stime = match_datetime.strftime('%I:%M %p')
-            etime = (match_datetime+timedelta(hours=1)).strftime('%I:%M %p')
+            ldate = match_datetime.strftime("%m/%d/%Y")
+            ddate = match_datetime.strftime("%b %d, %Y")
+            stime = match_datetime.strftime("%I:%M %p")
+            etime = (match_datetime+timedelta(hours=1)).strftime("%I:%M %p")
 
         # make sure the two players have an incomplete match:
         challonge.set_credentials("debaser19", config.CHALLONGE_KEY)
