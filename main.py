@@ -339,6 +339,10 @@ async def incomplete(ctx: commands.Context, group, round, second_round=None):
 async def fomschedule(
     ctx: commands.Context, player1: discord.Member, player2: discord.Member, sdate, stime
     ):
+    sheetid='s4'
+    testmod=0
+    if testmod==1:
+        sheetid='s4_test'
     if ctx.channel.name == ("scheduled-games") or ctx.channel.name == ("bot-test-channel"):
         # make sure both players are valid users on the server
         if not ctx.guild.get_member(int(player1.id)):
@@ -356,15 +360,17 @@ async def fomschedule(
         #parse the date/time and make sure it is after NOW:
         timezone="EDT"
         from datetime import datetime, timedelta
+        import pytz
         match_datetime = datetime.strptime(
                 f"{sdate} {stime}", "%m%d%Y %H%M"
             )
-        if match_datetime<datetime.now():
-            await ctx.reply("scheduled time has to be after NOW.  check formats: e.g. Aug 21, 2022 at 16:30 EDT should be 08212022 1630")
+        now_eastern=datetime.now().astimezone(pytz.timezone('US/Eastern')).replace(tzinfo=None)
+        if match_datetime<now_eastern:
+            await ctx.reply(f'scheduled time has to be after NOW ({now_eastern.strftime("%I:%M %p")} {timezone}).  check formats: e.g. Aug 21, 2022 at 16:30 {timezone} should be 08212022 1630')
             return
         else:
             ldate = match_datetime.strftime("%m/%d/%Y")
-            ddate = match_datetime.strftime("%b %d, %Y")
+            ddate = match_datetime.strftime("%A, %b %d, %Y")
             stime = match_datetime.strftime("%I:%M %p")
             etime = (match_datetime+timedelta(hours=1)).strftime("%I:%M %p")
 
@@ -373,15 +379,23 @@ async def fomschedule(
         tournament = challonge.tournaments.show(config.FOML_S4_ID)
         matches = challonge_commands.fetch_matches(tournament)
         reply_string=''
+        racedict = {
+                    "Human": "HU",
+                    "Night Elf": "NE",
+                    "Orc": "OC",
+                    "Undead": "UD",
+                    "Random": "RD"
+                    }
         for match in matches:
-            if (match.state != "complete" and
+            if ((match.state != "complete" or str(ctx.author)=="GaeBolg#4816") and
                     (
                     ((f"{player1.name}#{player1.discriminator}").lower() == str(match.p1_discord).lower() and (f"{player2.name}#{player2.discriminator}").lower() == str(match.p2_discord).lower()) or
                     ((f"{player1.name}#{player1.discriminator}").lower() == str(match.p2_discord).lower() and (f"{player2.name}#{player2.discriminator}").lower() == str(match.p1_discord).lower())
                     )
                 ):
-                race1=match.p1_race
-                race2=match.p2_race
+                
+                race1=racedict[match.p1_race]
+                race2=racedict[match.p2_race]
                 if (f"{player1.name}#{player1.discriminator}").lower() == str(match.p1_discord).lower():    
                     p1=player1
                     p2=player2
@@ -391,9 +405,7 @@ async def fomschedule(
                 #add schedule to the spreadsheet:
                 gc = gspread.service_account(filename=config.SERVICE_ACCOUNT_FILE)
                 sh = gc.open_by_url(config.MATCHUPS_SHEET)
-                sheet = sh.worksheet("s4")
-                # delete outdated records
-
+                sheet = sh.worksheet(sheetid)
                 # obtain smallest available id
                 used_ids=sheet.col_values(1)
                 addid=1
@@ -409,7 +421,7 @@ async def fomschedule(
                     rowid+=1
                     if p1.name== record.get("PLAYER 1") and p2.name== record.get("PLAYER 2"):
                         sh.values_update(
-                        f"s4_test!B{rowid}", 
+                        f"{sheetid}!B{rowid}", 
                         params={'valueInputOption': 'USER_ENTERED'},
                         body={'values': [[ldate, stime, etime]]}
                         )
@@ -426,16 +438,17 @@ async def fomschedule(
                             race1,
                             p2.name,
                             race2,
-                            match.group
+                            match.group,
+                            '',
+                            f'=IF(J{rowid}="","No caster yet",CONCAT("http://twitch.tv/",J{rowid}))'
                             ]
                     rowid+=1
                     sh.values_update(
-                        f"s4!A{rowid}", 
+                        f"{sheetid}!A{rowid}", 
                         params={'valueInputOption': 'USER_ENTERED'},
                         body={'values': [row_data]}
                         )
-                    sheet.update_acell(f"K{rowid}",f'=IF(J{rowid}="","No caster yet",CONCAT("http://twitch.tv/",J{rowid}))')
-                    updated=1
+                    #sheet.update_acell(f"K{rowid}",f'=IF(J{rowid}="","No caster yet",CONCAT("http://twitch.tv/",J{rowid}))')
                     reply_string+=f"**Group [{match.group}]** {p1.mention} [{race1}] vs {p2.mention} [{race2}] is scheduled at **{stime} {timezone} on {ddate}.** The first player is A."
                     logger.info(f"{ctx.author} scheduled a match between {player1} and {player2}")
                 break
@@ -444,18 +457,15 @@ async def fomschedule(
             await ctx.send(f"The two players do not have an incomplete match to schedule.  Please check spelling and only use @user as player identifiers.")
         else:
             await ctx.send(reply_string)
-
-        #delete outdated records in the background -- pending approval by colorado16
-        """
-        records = sheet.get_all_records()
-        used_ids=[]
-        rowid=1
-        for record in records:
-            rowid+=1
-            if record.get("DATE")=='' or datetime.strptime(record.get("DATE"), "%m/%d/%Y") + timedelta(days=2) <= datetime.now():
-              sheet.delete_rows(rowid)
-              rowid-=1
-        """
+            #delete outdated records in the background -- pending approval by colorado16
+            """
+            rowid=1
+            for record in records:
+                rowid+=1
+                if record.get("DATE")=='' or datetime.strptime(record.get("DATE"), "%m/%d/%Y") + timedelta(days=2) <= datetime.now():
+                  sheet.delete_rows(rowid)
+                  rowid-=1
+            """
     else:
         await ctx.send("please use the #scheduled-games channel for this command.")
         
