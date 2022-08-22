@@ -340,8 +340,6 @@ async def fomschedule(
     ctx: commands.Context, player1: discord.Member, player2: discord.Member, sdate, stime
     ):
     if ctx.channel.name == ("scheduled-games") or ctx.channel.name == ("bot-test-channel"):
-        
-
         # make sure both players are valid users on the server
         if not ctx.guild.get_member(int(player1.id)):
             logger.warning(f"{player1} is not a valid user on this server")
@@ -394,45 +392,70 @@ async def fomschedule(
                 gc = gspread.service_account(filename=config.SERVICE_ACCOUNT_FILE)
                 sh = gc.open_by_url(config.MATCHUPS_SHEET)
                 sheet = sh.worksheet("s4")
+                # delete outdated records
+
+                # obtain smallest available id
+                used_ids=sheet.col_values(1)
+                addid=1
+                for x in range(1,10000):
+                  if str(x) not in used_ids:
+                    addid=x
+                    break
                 #look for already scheduled records to update:
                 records = sheet.get_all_records()
-                maxid=0
-                rowid=1
                 updated=0
+                rowid=1                
                 for record in records:
                     rowid+=1
-                    if int(record.get("id"))>maxid: maxid=record.get("id")
                     if p1.name== record.get("PLAYER 1") and p2.name== record.get("PLAYER 2"):
                         sh.values_update(
-                        f"s4!B{rowid}", 
+                        f"s4_test!B{rowid}", 
                         params={'valueInputOption': 'USER_ENTERED'},
                         body={'values': [[ldate, stime, etime]]}
                         )
-                        updated=1
                         reply_string+=f"**Group [{match.group}]** {p1.mention} [{race1}] vs {p2.mention} [{race2}] is rescheduled to **{stime} {timezone} on {ddate}**. The first player is A."
                         logger.info(f"{ctx.author} rescheduled a match between {player1} and {player2}")
+                        updated=1
                 #new match
                 if updated!=1:
-                    sheet.append_row(
-                        (
-                            int(maxid)+1,
+                    row_data=[str(addid),
                             ldate,
                             stime,
-                            stime,#+1 hour
+                            etime,
                             p1.name,
                             race1,
                             p2.name,
                             race2,
-                            match.group,
+                            match.group
+                            ]
+                    rowid+=1
+                    sh.values_update(
+                        f"s4!A{rowid}", 
+                        params={'valueInputOption': 'USER_ENTERED'},
+                        body={'values': [row_data]}
                         )
-                    )
+                    sheet.update_acell(f"K{rowid}",f'=IF(J{rowid}="","No caster yet",CONCAT("http://twitch.tv/",J{rowid}))')
+                    updated=1
                     reply_string+=f"**Group [{match.group}]** {p1.mention} [{race1}] vs {p2.mention} [{race2}] is scheduled at **{stime} {timezone} on {ddate}.** The first player is A."
                     logger.info(f"{ctx.author} scheduled a match between {player1} and {player2}")
-                 
+                break
+
         if reply_string=="":
             await ctx.send(f"The two players do not have an incomplete match to schedule.  Please check spelling and only use @user as player identifiers.")
         else:
             await ctx.send(reply_string)
+
+        #delete outdated records in the background -- pending approval by colorado16
+        """
+        records = sheet.get_all_records()
+        used_ids=[]
+        rowid=1
+        for record in records:
+            rowid+=1
+            if record.get("DATE")=='' or datetime.strptime(record.get("DATE"), "%m/%d/%Y") + timedelta(days=2) <= datetime.now():
+              sheet.delete_rows(rowid)
+              rowid-=1
+        """
     else:
         await ctx.send("please use the #scheduled-games channel for this command.")
         
