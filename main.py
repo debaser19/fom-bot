@@ -382,14 +382,12 @@ async def fomschedule(
                     ((f"{player1.name}#{player1.discriminator}").lower() == str(match.p2_discord).lower() and (f"{player2.name}#{player2.discriminator}").lower() == str(match.p1_discord).lower())
                     )
                 ):
-                if (f"{player1.name}#{player1.discriminator}").lower() == str(match.p1_discord).lower():
-                    race1=match.p1_race
-                    race2=match.p2_race
+                race1=match.p1_race
+                race2=match.p2_race
+                if (f"{player1.name}#{player1.discriminator}").lower() == str(match.p1_discord).lower():    
                     p1=player1
                     p2=player2
                 else:
-                    race1=match.p2_race
-                    race2=match.p1_race
                     p1=player2
                     p2=player1
                 #add schedule to the spreadsheet:
@@ -411,7 +409,7 @@ async def fomschedule(
                         body={'values': [[ldate, stime, etime]]}
                         )
                         updated=1
-                        reply_string+=f"**Group [{match.group}]** {p1.mention} [{race1}] vs {p2.mention} [{race2}] is rescheduled to **{stime} {timezone} on {ddate}**"
+                        reply_string+=f"**Group [{match.group}]** {p1.mention} [{race1}] vs {p2.mention} [{race2}] is rescheduled to **{stime} {timezone} on {ddate}**. The first player is A."
                         logger.info(f"{ctx.author} rescheduled a match between {player1} and {player2}")
                 #new match
                 if updated!=1:
@@ -428,7 +426,7 @@ async def fomschedule(
                             match.group,
                         )
                     )
-                    reply_string+=f"**Group [{match.group}]** {p1.mention} [{race1}] vs {p2.mention} [{race2}] is scheduled at **{stime} {timezone} on {ddate}**"
+                    reply_string+=f"**Group [{match.group}]** {p1.mention} [{race1}] vs {p2.mention} [{race2}] is scheduled at **{stime} {timezone} on {ddate}.** The first player is A."
                     logger.info(f"{ctx.author} scheduled a match between {player1} and {player2}")
                  
         if reply_string=="":
