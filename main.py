@@ -366,7 +366,7 @@ async def fomschedule(
             return
         else:
             ldate = match_datetime.strftime('%m/%d/%Y')
-            ddate = match_datetime.strftime('%b %d, %Y')
+            ddate = match_datetime.strftime('%Y, %b %d, %Y')
             stime = match_datetime.strftime('%I:%M %p')
             etime = (match_datetime+timedelta(hours=1)).strftime('%I:%M %p')
 
@@ -411,7 +411,7 @@ async def fomschedule(
                         body={'values': [[ldate, stime, etime]]}
                         )
                         updated=1
-                        reply_string+=f"**Group [{match.group}]** {p1.mention} [{race1}] vs {p2.mention} [{race2}] is rescheduled to **{stime} on {ddate} {timezone}**"
+                        reply_string+=f"**Group [{match.group}]** {p1.mention} [{race1}] vs {p2.mention} [{race2}] is rescheduled to **{stime} {timezone} on {ddate}**"
                         logger.info(f"{ctx.author} rescheduled a match between {player1} and {player2}")
                 #new match
                 if updated!=1:
@@ -428,7 +428,7 @@ async def fomschedule(
                             match.group,
                         )
                     )
-                    reply_string+=f"**Group [{match.group}]** {p1.mention} [{race1}] vs {p2.mention} [{race2}] is scheduled at **{stime} on {ddate} {timezone}**"
+                    reply_string+=f"**Group [{match.group}]** {p1.mention} [{race1}] vs {p2.mention} [{race2}] is scheduled at **{stime} {timezone} on {ddate}**"
                     logger.info(f"{ctx.author} scheduled a match between {player1} and {player2}")
                  
         if reply_string=="":
