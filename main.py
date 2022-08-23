@@ -334,16 +334,23 @@ async def incomplete(ctx: commands.Context, group, round, second_round=None):
         f"{info_string}**GROUP {match.group.upper()} - ROUND {round}**\n{reply_string}"
     )
 
+
 # schedule a match between two players
 @bot.command(name="fomschedule")
 async def fomschedule(
-    ctx: commands.Context, player1: discord.Member, player2: discord.Member, sdate, stime
+    ctx: commands.Context,
+    player1: discord.Member,
+    player2: discord.Member,
+    sdate,
+    stime,
+):
+    sheetid = "s4"
+    testmod = 0
+    if testmod == 1:
+        sheetid = "s4_test"
+    if ctx.channel.name == ("scheduled-games") or ctx.channel.name == (
+        "bot-test-channel"
     ):
-    sheetid='s4'
-    testmod=0
-    if testmod==1:
-        sheetid='s4_test'
-    if ctx.channel.name == ("scheduled-games") or ctx.channel.name == ("bot-test-channel"):
         # make sure both players are valid users on the server
         if not ctx.guild.get_member(int(player1.id)):
             logger.warning(f"{player1} is not a valid user on this server")
@@ -353,111 +360,140 @@ async def fomschedule(
             logger.warning(f"{player2} is not a valid user on this server")
             await ctx.reply(f"{player2} is not a valid user on this server.")
             return
-        #make sure the date and time formats are correct:
-        if not sdate.isnumeric() or not stime.isnumeric() or len(sdate)!=8 or len(stime)!=4:
-            await ctx.reply("date or time format is incorrect.  e.g. Aug 21, 2022 at 16:30 EDT should be 08212022 1630.")
+        # make sure the date and time formats are correct:
+        if (
+            not sdate.isnumeric()
+            or not stime.isnumeric()
+            or len(sdate) != 8
+            or len(stime) != 4
+        ):
+            await ctx.reply(
+                "date or time format is incorrect.  e.g. Aug 21, 2022 at 16:30 EDT should be 08212022 1630."
+            )
             return
-        #parse the date/time and make sure it is after NOW:
-        timezone="EDT"
+        # parse the date/time and make sure it is after NOW:
+        timezone = "EDT"
         from datetime import datetime, timedelta
         import pytz
-        match_datetime = datetime.strptime(
-                f"{sdate} {stime}", "%m%d%Y %H%M"
+
+        match_datetime = datetime.strptime(f"{sdate} {stime}", "%m%d%Y %H%M")
+        now_eastern = (
+            datetime.now().astimezone(pytz.timezone("US/Eastern")).replace(tzinfo=None)
+        )
+        if match_datetime < now_eastern:
+            await ctx.reply(
+                f'scheduled time has to be after NOW ({now_eastern.strftime("%I:%M %p")} {timezone}).  check formats: e.g. Aug 21, 2022 at 16:30 {timezone} should be 08212022 1630'
             )
-        now_eastern=datetime.now().astimezone(pytz.timezone('US/Eastern')).replace(tzinfo=None)
-        if match_datetime<now_eastern:
-            await ctx.reply(f'scheduled time has to be after NOW ({now_eastern.strftime("%I:%M %p")} {timezone}).  check formats: e.g. Aug 21, 2022 at 16:30 {timezone} should be 08212022 1630')
             return
         else:
             ldate = match_datetime.strftime("%m/%d/%Y")
             ddate = match_datetime.strftime("%A, %b %d, %Y")
             stime = match_datetime.strftime("%I:%M %p")
-            etime = (match_datetime+timedelta(hours=1)).strftime("%I:%M %p")
+            etime = (match_datetime + timedelta(hours=1)).strftime("%I:%M %p")
 
         # make sure the two players have an incomplete match:
         challonge.set_credentials("debaser19", config.CHALLONGE_KEY)
         tournament = challonge.tournaments.show(config.FOML_S4_ID)
         matches = challonge_commands.fetch_matches(tournament)
-        reply_string=''
+        reply_string = ""
         racedict = {
-                    "Human": "HU",
-                    "Night Elf": "NE",
-                    "Orc": "OC",
-                    "Undead": "UD",
-                    "Random": "RD"
-                    }
+            "Human": "HU",
+            "Night Elf": "NE",
+            "Orc": "OC",
+            "Undead": "UD",
+            "Random": "RD",
+        }
         for match in matches:
-            if ((match.state != "complete" or str(ctx.author)=="GaeBolg#4816") and
-                    (
-                    ((f"{player1.name}#{player1.discriminator}").lower() == str(match.p1_discord).lower() and (f"{player2.name}#{player2.discriminator}").lower() == str(match.p2_discord).lower()) or
-                    ((f"{player1.name}#{player1.discriminator}").lower() == str(match.p2_discord).lower() and (f"{player2.name}#{player2.discriminator}").lower() == str(match.p1_discord).lower())
-                    )
-                ):
-                
-                race1=racedict[match.p1_race]
-                race2=racedict[match.p2_race]
-                if (f"{player1.name}#{player1.discriminator}").lower() == str(match.p1_discord).lower():    
-                    p1=player1
-                    p2=player2
+            if (match.state != "complete" or str(ctx.author) == "GaeBolg#4816") and (
+                (
+                    (f"{player1.name}#{player1.discriminator}").lower()
+                    == str(match.p1_discord).lower()
+                    and (f"{player2.name}#{player2.discriminator}").lower()
+                    == str(match.p2_discord).lower()
+                )
+                or (
+                    (f"{player1.name}#{player1.discriminator}").lower()
+                    == str(match.p2_discord).lower()
+                    and (f"{player2.name}#{player2.discriminator}").lower()
+                    == str(match.p1_discord).lower()
+                )
+            ):
+
+                race1 = racedict[match.p1_race]
+                race2 = racedict[match.p2_race]
+                if (f"{player1.name}#{player1.discriminator}").lower() == str(
+                    match.p1_discord
+                ).lower():
+                    p1 = player1
+                    p2 = player2
                 else:
-                    p1=player2
-                    p2=player1
-                #add schedule to the spreadsheet:
+                    p1 = player2
+                    p2 = player1
+                # add schedule to the spreadsheet:
                 gc = gspread.service_account(filename=config.SERVICE_ACCOUNT_FILE)
                 sh = gc.open_by_url(config.MATCHUPS_SHEET)
                 sheet = sh.worksheet(sheetid)
                 # obtain smallest available id
-                used_ids=sheet.col_values(1)
-                addid=1
-                for x in range(1,10000):
-                  if str(x) not in used_ids:
-                    addid=x
-                    break
-                #look for already scheduled records to update:
+                used_ids = sheet.col_values(1)
+                addid = 1
+                for x in range(1, 10000):
+                    if str(x) not in used_ids:
+                        addid = x
+                        break
+                # look for already scheduled records to update:
                 records = sheet.get_all_records()
-                updated=0
-                rowid=1                
+                updated = 0
+                rowid = 1
                 for record in records:
-                    rowid+=1
-                    if p1.name== record.get("PLAYER 1") and p2.name== record.get("PLAYER 2"):
+                    rowid += 1
+                    if p1.name == record.get("PLAYER 1") and p2.name == record.get(
+                        "PLAYER 2"
+                    ):
                         sh.values_update(
-                        f"{sheetid}!B{rowid}", 
-                        params={'valueInputOption': 'USER_ENTERED'},
-                        body={'values': [[ldate, stime, etime]]}
+                            f"{sheetid}!B{rowid}",
+                            params={"valueInputOption": "USER_ENTERED"},
+                            body={"values": [[ldate, stime, etime]]},
                         )
-                        reply_string+=f"**Group [{match.group}]** {p1.mention} [{race1}] vs {p2.mention} [{race2}] is rescheduled to **{stime} {timezone} on {ddate}**. The first player is A."
-                        logger.info(f"{ctx.author} rescheduled a match between {player1} and {player2}")
-                        updated=1
-                #new match
-                if updated!=1:
-                    row_data=[str(addid),
-                            ldate,
-                            stime,
-                            etime,
-                            p1.name,
-                            race1,
-                            p2.name,
-                            race2,
-                            match.group,
-                            '',
-                            f'=IF(J{rowid}="","No caster yet",CONCAT("http://twitch.tv/",J{rowid}))'
-                            ]
-                    rowid+=1
+                        reply_string += f"**Group [{match.group}]** {p1.mention} [{race1}] vs {p2.mention} [{race2}] is rescheduled to **{stime} {timezone} on {ddate}**. The first player is A."
+                        logger.info(
+                            f"{ctx.author} rescheduled a match between {player1} and {player2}"
+                        )
+                        updated = 1
+                # new match
+                if updated != 1:
+                    row_data = [
+                        str(addid),
+                        ldate,
+                        stime,
+                        etime,
+                        p1.name,
+                        race1,
+                        p2.name,
+                        race2,
+                        match.group,
+                        "",
+                        f'=IF(J{rowid}="","No caster yet",CONCAT("http://twitch.tv/",J{rowid}))',
+                    ]
+                    rowid += 1
                     sh.values_update(
-                        f"{sheetid}!A{rowid}", 
-                        params={'valueInputOption': 'USER_ENTERED'},
-                        body={'values': [row_data]}
-                        )
-                    #sheet.update_acell(f"K{rowid}",f'=IF(J{rowid}="","No caster yet",CONCAT("http://twitch.tv/",J{rowid}))')
-                    reply_string+=f"**Group [{match.group}]** {p1.mention} [{race1}] vs {p2.mention} [{race2}] is scheduled at **{stime} {timezone} on {ddate}.** The first player is A."
-                    logger.info(f"{ctx.author} scheduled a match between {player1} and {player2}")
+                        f"{sheetid}!A{rowid}",
+                        params={"valueInputOption": "USER_ENTERED"},
+                        body={"values": [row_data]},
+                    )
+                    # sheet.update_acell(f"K{rowid}",f'=IF(J{rowid}="","No caster yet",CONCAT("http://twitch.tv/",J{rowid}))')
+                    reply_string += f"**Group [{match.group}]** {p1.mention} [{race1}] vs {p2.mention} [{race2}] is scheduled at **{stime} {timezone} on {ddate}.** The first player is A."
+                    logger.info(
+                        f"{ctx.author} scheduled a match between {player1} and {player2}"
+                    )
                 break
 
-        if reply_string=="":
-            await ctx.send(f"The two players do not have an incomplete match to schedule.  Please check spelling and only use @user as player identifiers.")
+        if reply_string == "":
+            await ctx.send(
+                f"The two players do not have an incomplete match to schedule.  Please check spelling and only use @user as player identifiers."
+            )
         else:
             await ctx.send(reply_string)
-            #delete outdated records in the background -- pending approval by colorado16
+            # delete outdated records in the background -- pending approval by colorado16
             """
             rowid=1
             for record in records:
@@ -468,7 +504,8 @@ async def fomschedule(
             """
     else:
         await ctx.send("please use the #scheduled-games channel for this command.")
-        
+
+
 # Veto commands
 # TODO: Add a way to start veto process between two players
 @bot.command(name="startveto")
@@ -534,7 +571,7 @@ async def upcoming(ctx: commands.Context):
             count += 1
 
         result += "\n**Claim matches with `!claim <match_id> <twitch_name>`**"
-        result += "\n**For full schedule check out <https://warcraft-gym.com/>**"
+        result += "\n**For full schedule check out <https://getmannered.com/>**"
 
     # convert result to discord embed
     embed = discord.Embed(
@@ -689,7 +726,7 @@ async def check_scheduled_matches():
             count += 1
 
         result += "\n**Claim matches with `!claim <match_id> <twitch_name>`**"
-        result += "\n**For full schedule check out <https://warcraft-gym.com/>**"
+        result += "\n**For full schedule check out <https://getmannered.com/>**"
 
     # convert result to discord embed
     embed = discord.Embed(
@@ -744,7 +781,7 @@ async def update_stream_schedule():
                     "\n Claim matches with `!claim <match_id> <twitch_name>`"
                 )
                 embed.description += (
-                    "\n**For full schedule check out <https://warcraft-gym.com/>**"
+                    "\n**For full schedule check out <https://getmannered.com/>**"
                 )
                 embeds.append(embed)
                 result = ""
@@ -765,7 +802,7 @@ async def update_stream_schedule():
                 "\n Claim matches with `!claim <match_id> <twitch_name>`"
             )
             embed.description += (
-                "\n**For full schedule check out <https://warcraft-gym.com/>**"
+                "\n**For full schedule check out <https://getmannered.com/>**"
             )
             embed.description += f"\n *Updated: {last_update_time_string}*"
 
