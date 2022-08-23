@@ -388,7 +388,7 @@ async def fomschedule(
             match_datetime < now_eastern
         ):  # changed below date to be formatted unix timestamp for discord
             await ctx.reply(
-                f"scheduled time has to be after NOW ( <t:{int(now_eastern.timestamp())}:f>).  check formats: e.g. Aug 21, 2022 at 16:30 {timezone} should be 08212022 1630"
+                f"scheduled time has to be after NOW ( <t:{int(now_eastern.timestamp())}:f> Local Time).  check formats: e.g. Aug 21, 2022 at 16:30 {timezone} should be 08212022 1630"
             )
             return
         else:
@@ -460,7 +460,12 @@ async def fomschedule(
                             params={"valueInputOption": "USER_ENTERED"},
                             body={"values": [[ldate, stime, etime]]},
                         )
-                        reply_string += f"**Group [{match.group}]** {p1.mention} [{race1}] vs {p2.mention} [{race2}] is rescheduled to {match_fomatted_unix_timestamp}. The first player is A."
+                        reply_string += f"**Group [{match.group}]** {p1.mention} [{race1}] vs {p2.mention} [{race2}] has been rescheduled\n"
+                        reply_string += (
+                            f"\n**Local Time**:{match_fomatted_unix_timestamp}"
+                        )
+                        reply_string += f"\n**{timezone}**: {ddate} {stime}"
+                        reply_string += "\n\n The first player is Player A"
                         logger.info(
                             f"{ctx.author} rescheduled a match between {player1} and {player2}"
                         )
@@ -487,7 +492,10 @@ async def fomschedule(
                         body={"values": [row_data]},
                     )
                     # sheet.update_acell(f"K{rowid}",f'=IF(J{rowid}="","No caster yet",CONCAT("http://twitch.tv/",J{rowid}))')
-                    reply_string += f"**Group [{match.group}]** {p1.mention} [{race1}] vs {p2.mention} [{race2}] is scheduled at {match_fomatted_unix_timestamp}. The first player is A."
+                    reply_string += f"**Group [{match.group}]** {p1.mention} [{race1}] vs {p2.mention} [{race2}] has been scheduled\n"
+                    reply_string += f"\n**Local Time**:{match_fomatted_unix_timestamp}"
+                    reply_string += f"\n**{timezone}**: {ddate} {stime}"
+                    reply_string += "\n\n The first player is Player A"
                     logger.info(
                         f"{ctx.author} scheduled a match between {player1} and {player2}"
                     )
