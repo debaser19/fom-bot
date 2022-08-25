@@ -551,6 +551,63 @@ async def startveto(
 
     reaction = await bot.wait_for("reaction_add", check=check)
     await ctx.send(f"{reaction[0]} was selected")
+    await player_a_message.delete()
+
+    maps_list = [
+        {
+            "map_emote": "🇦",
+            "map_abbreviation": "AL",
+            "map_name": "Autumn Leaves",
+        },
+        {
+            "map_emote": "🇧",
+            "map_abbreviation": "CH",
+            "map_name": "Concealed Hill",
+        },
+        {
+            "map_emote": "🇨",
+            "map_abbreviation": "EI v2",
+            "map_name": "Echo Isles v2",
+        },
+        {
+            "map_emote": "🇩",
+            "map_abbreviation": "LR",
+            "map_name": "Last Refuge",
+        },
+        {
+            "map_emote": "🇪",
+            "map_abbreviation": "NI",
+            "map_name": "Northern Isles",
+        },
+        {
+            "map_emote": "🇫",
+            "map_abbreviation": "SG",
+            "map_name": "Shallow Grave",
+        },
+        {
+            "map_emote": "🇬",
+            "map_abbreviation": "TH",
+            "map_name": "Tidehunters",
+        },
+        {
+            "map_emote": "🇭",
+            "map_abbreviation": "ST",
+            "map_name": "Springtime",
+        },
+        {
+            "map_emote": "🇮",
+            "map_abbreviation": "SV",
+            "map_name": "Secret Valley",
+        },
+    ]
+
+    maps_string = ""
+    for map in maps_list:
+        maps_string += f"{map['map_emote']} - {map['map_name']}\n"
+
+    maps_message = await ctx.reply(maps_string)
+    for map in maps_list:
+        await maps_message.add_reaction(map["map_emote"])
 
 
 @bot.command(name="upcoming")
