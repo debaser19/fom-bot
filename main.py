@@ -866,7 +866,7 @@ async def on_ready():
     scheduler = AsyncIOScheduler()
 
     # add scheduled matches job to scheduler
-    scheduler.add_job(check_scheduled_matches, CronTrigger(hour="0,6,12,18"))
+    scheduler.add_job(check_scheduled_matches, CronTrigger(hour="0,12"))
     # add update stream schedule job to scheduler to run at every 5th minute
     scheduler.add_job(update_stream_schedule, CronTrigger(minute="*/5"))
 
